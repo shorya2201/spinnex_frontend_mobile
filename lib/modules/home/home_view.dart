@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -327,19 +326,27 @@ class HomeView extends GetView<HomeController> {
           onTap: () => _showEditPlayerModal(context, index),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
             decoration: BoxDecoration(
-              color: borderColor.withOpacity(0.12),
+              gradient: LinearGradient(
+                colors: [
+                  borderColor.withOpacity(0.28),
+                  borderColor.withOpacity(0.10),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: borderColor,
-                width: 1.5,
+                width: 1.8,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: borderColor.withOpacity(0.35),
-                  blurRadius: 8,
+                  color: borderColor.withOpacity(0.42),
+                  blurRadius: 10,
                   spreadRadius: 1,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -816,19 +823,23 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
   late String _selectedEmoji;
   late Color _selectedColor;
 
-  static const List<String> _avatarOptions = [
-    '🎈', '🌟', '🎮', '🦄', '🦊', '🐯', '👻', '🍕', '👑', '🚀', '💎', '🔥',
-    '👾', '⚡', '🛸', '🎸', '🎲', '🐼', '🎧', '🔮', '🎨', '🍿', '🍩', '🍀'
-  ];
+  static List<String> get _avatarOptions => HomeController.playerEmojis;
 
   static const List<Color> _colorOptions = [
-    Color(0xFFFF007F), // Neon Pink / Magenta
-    Color(0xFF00FFFF), // Cyan
-    Color(0xFF39FF14), // Lime Green
-    Color(0xFFFFEA00), // Yellow
-    Color(0xFFFF5722), // Orange
-    Color(0xFFB026FF), // Purple
-    Color(0xFF00E676), // Teal
+    Color(0xFFFF0055), // Hot Crimson
+    Color(0xFF8B00FF), // Deep Cyber Violet
+    Color(0xFF39FF14), // Electric Neon Lime
+    Color(0xFF00FFFF), // Neon Cyan
+    Color(0xFFFF4500), // Fiery Chili Orange
+    Color(0xFFFFEA00), // Electric Voltage Yellow
+    Color(0xFF0070FF), // Royal Cyber Blue
+    Color(0xFFFF6B00), // Spicy Tangerine
+    Color(0xFF00FF66), // Toxic Acid Mint
+    Color(0xFFE60039), // Rich Ruby Red
+    Color(0xFFB026FF), // Electric Purple
+    Color(0xFF00E5FF), // Bright Aqua Blue
+    Color(0xFFFFB700), // Sunset Amber Gold
+    Color(0xFFFF00A0), // Neon Electric Magenta
   ];
 
   @override
@@ -846,11 +857,18 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
   }
 
   void _randomizeName() {
-    final Random random = Random();
-    String newName = HomeController.randomNames[random.nextInt(HomeController.randomNames.length)];
+    String newName = widget.controller.getRandomUniqueName(
+      currentName: _nameController.text.trim(),
+    );
+    String matchingEmoji = widget.controller.getMatchingEmojiForName(newName);
     setState(() {
       _nameController.text = newName;
+      _selectedEmoji = matchingEmoji;
     });
+    if (widget.index < widget.controller.playerEmojisList.length) {
+      widget.controller.playerEmojisList[widget.index] = matchingEmoji;
+      widget.controller.playerEmojisList.refresh();
+    }
   }
 
   @override
@@ -1008,52 +1026,129 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
               const SizedBox(height: 24),
 
               // CHOOSE AVATAR Section
-              Text(
-                "CHOOSE AVATAR",
-                style: GoogleFonts.orbitron(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                  color: Colors.white.withOpacity(0.7),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "CHOOSE AVATAR",
+                    style: GoogleFonts.orbitron(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                  Text(
+                    "🔒 = Taken by player",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(0.4),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 14),
               SizedBox(
-                height: 52,
+                height: 54,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   itemCount: _avatarOptions.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 16),
+                  separatorBuilder: (_, __) => const SizedBox(width: 14),
                   itemBuilder: (context, i) {
                     final avatar = _avatarOptions[i];
                     final isSelected = _selectedEmoji == avatar;
+
+                    bool isChosenByOther = false;
+                    String? takenByPlayerName;
+                    for (int k = 0; k < widget.controller.playerEmojisList.length; k++) {
+                      if (k != widget.index && widget.controller.playerEmojisList[k] == avatar) {
+                        isChosenByOther = true;
+                        takenByPlayerName = widget.controller.playerControllers[k].text.trim();
+                        if (takenByPlayerName.isEmpty) {
+                          takenByPlayerName = "Player ${k + 1}";
+                        }
+                        break;
+                      }
+                    }
+
                     return GestureDetector(
                       onTap: () {
+                        if (isChosenByOther) {
+                          Get.snackbar(
+                            "Avatar Taken",
+                            "$avatar is already chosen by $takenByPlayerName.",
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.amber.shade900.withOpacity(0.9),
+                            colorText: Colors.white,
+                            duration: const Duration(seconds: 2),
+                          );
+                          return;
+                        }
                         setState(() => _selectedEmoji = avatar);
                         if (widget.index < widget.controller.playerEmojisList.length) {
                           widget.controller.playerEmojisList[widget.index] = avatar;
                           widget.controller.playerEmojisList.refresh();
                         }
                       },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 48,
-                        height: 48,
+                      child: Stack(
+                        clipBehavior: Clip.none,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.white.withOpacity(0.15)
-                              : Colors.transparent,
-                          shape: BoxShape.circle,
-                          border: isSelected
-                              ? Border.all(color: _selectedColor, width: 2)
-                              : null,
-                        ),
-                        child: Text(
-                          avatar,
-                          style: TextStyle(fontSize: isSelected ? 28 : 24),
-                        ),
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 48,
+                            height: 48,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? _selectedColor.withOpacity(0.2)
+                                  : isChosenByOther
+                                      ? Colors.white.withOpacity(0.02)
+                                      : Colors.white.withOpacity(0.06),
+                              shape: BoxShape.circle,
+                              border: isSelected
+                                  ? Border.all(color: _selectedColor, width: 2.5)
+                                  : isChosenByOther
+                                      ? Border.all(color: Colors.white.withOpacity(0.08), width: 1)
+                                      : Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: _selectedColor.withOpacity(0.5),
+                                        blurRadius: 8,
+                                      )
+                                    ]
+                                  : [],
+                            ),
+                            child: Opacity(
+                              opacity: isChosenByOther ? 0.3 : 1.0,
+                              child: Text(
+                                avatar,
+                                style: TextStyle(fontSize: isSelected ? 26 : 22),
+                              ),
+                            ),
+                          ),
+                          if (isChosenByOther)
+                            Positioned(
+                              right: -2,
+                              top: -2,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF1744),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: const Color(0xFF0D031A), width: 1.5),
+                                ),
+                                child: const Icon(
+                                  Icons.lock_rounded,
+                                  size: 9,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     );
                   },

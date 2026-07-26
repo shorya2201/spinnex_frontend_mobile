@@ -21,31 +21,162 @@ class HomeController extends GetxController {
   final List<String> categories = ['Classic', 'Party', 'Spicy'];
 
   static const List<Color> glowColors = [
-    Color(0xFFFF007F), // Neon Pink
-    Color(0xFF00FFFF), // Cyan
-    Color(0xFF39FF14), // Neon Lime
-    Color(0xFFFFEA00), // Yellow
-    Color(0xFFFF5722), // Orange
-    Color(0xFFB026FF), // Purple
-    Color(0xFF00E676), // Teal
+    Color(0xFFFF0055), // Hot Crimson
+    Color(0xFF8B00FF), // Deep Cyber Violet
+    Color(0xFF39FF14), // Electric Neon Lime
+    Color(0xFF00FFFF), // Neon Cyan
+    Color(0xFFFF4500), // Fiery Chili Orange
+    Color(0xFFFFEA00), // Electric Voltage Yellow
+    Color(0xFF0070FF), // Royal Cyber Blue
+    Color(0xFFFF6B00), // Spicy Tangerine
+    Color(0xFF00FF66), // Toxic Acid Mint
+    Color(0xFFE60039), // Rich Ruby Red
+    Color(0xFFB026FF), // Electric Purple
+    Color(0xFF00E5FF), // Bright Aqua Blue
+    Color(0xFFFFB700), // Sunset Amber Gold
+    Color(0xFFFF00A0), // Neon Electric Magenta
   ];
 
   static const List<String> playerEmojis = [
-    '👾', '⚡', '👑', '🍕', '🦄', '🛸', '💎', '🔥', '🎸', '🎲',
-    '🦊', '🐼', '🚀', '🌟', '🎧', '🔮', '🎨', '👻', '🍭', '🍀',
-    '🐯', '🦁', '🦖', '🍿', '🧁', '🍦', '🎈', '🎉', '🍩', '🎮'
+    '💃', '💅', '👸', '👑', '🕶️', '💄', '🧜‍♀️', '🪩', '🥳', '🥂',
+    '🎀', '👠', '✨', '🌟', '🌙', '🔮', '💎', '🔥', '💖', '🌼',
+    '🦊', '🐼', '🦁', '🦙', '🐸', '👾', '🥷', '🌀', '😈', '🤖',
+    '🚀', '🎧', '🎸', '🍿', '🍩', '🧁', '🍦', '🍸', '🎆', '🌺',
+    '🏆', '🏴‍☠️', '🥔', '🪞', '🧿', '💡', '🧸', '🛡️', '💀', '🍹'
   ];
 
+  static const Map<String, String> nameEmojiMap = {
+    // Girl Names & Female Party Titles
+    'Vibe Queen': '👑',
+    'Neon Goddess': '✨',
+    'Cyber Diva': '💅',
+    'Sassy Siren': '🧜‍♀️',
+    'Party Princess': '👸',
+    'Glam Girl': '💄',
+    'Dancing Queen': '💃',
+    'Boss Babe': '🕶️',
+    'Cosmic Babe': '🌌',
+    'Starlight Stella': '🌟',
+    'Luna Love': '🌙',
+    'Bella Spin': '💫',
+    'Zoe Zing': '⚡',
+    'Aria Star': '⭐',
+    'Maya Magic': '🔮',
+    'Ruby Spark': '💎',
+    'Chloe Glow': '💖',
+    'Daisy Dare': '🌼',
+    'Sparkle Girl': '❇️',
+    'Wild Cat': '🐱',
+    'Velvet Vixen': '🦊',
+    'Drama Queen': '🎭',
+    'Pixie Dust': '🧚‍♀️',
+    'Sofia Sun': '☀️',
+    'Niya Nova': '🌠',
+    'Sassy Queen': '🪞',
+    'Fierce Fiona': '🔥',
+    'Chai Queen': '☕',
+    'Mystic Maya': '🧿',
+    'Glow Girl': '💡',
+
+    // Cool & Fun Party Names
+    'Neon Ninja': '🥷',
+    'Spin Master': '🌀',
+    'Daring Devil': '😈',
+    'Truth Seeker': '🔍',
+    'Vibe Lord': '🎧',
+    'Disco King': '🪩',
+    'Glitch Star': '👾',
+    'Whiskey Wizard': '🧙‍♂️',
+    'Cyber Punk': '🤖',
+    'Cosmic Cow': '🐮',
+    'Party Animal': '🦁',
+    'Salty McSalt': '🧂',
+    'Joker': '🃏',
+    'Golden Spin': '🏆',
+    'Rule Breaker': '🏴‍☠️',
+    'Mystery Guest': '🕵️',
+    'Wild Card': '🎴',
+    'Llama Drama': '🦙',
+    'Meme Lord': '🐸',
+    'Couch Potato': '🥔',
+    'Speedy': '🏎️',
+    'Pancake': '🥞',
+    'Noodle': '🍜',
+    'Pickle': '🥒',
+    'Gummy Bear': '🧸',
+    'Pixel Hero': '🛡️',
+    'Ghost Rider': '💀',
+    'Space Cadet': '🚀',
+  };
+
   static const List<String> randomNames = [
+    // Girl Names & Female Party Titles
+    'Vibe Queen', 'Neon Goddess', 'Cyber Diva', 'Sassy Siren', 'Party Princess',
+    'Glam Girl', 'Dancing Queen', 'Boss Babe', 'Cosmic Babe', 'Starlight Stella',
+    'Luna Love', 'Bella Spin', 'Zoe Zing', 'Aria Star', 'Maya Magic',
+    'Ruby Spark', 'Chloe Glow', 'Daisy Dare', 'Sparkle Girl', 'Wild Cat',
+    'Velvet Vixen', 'Drama Queen', 'Pixie Dust', 'Sofia Sun', 'Niya Nova',
+    'Sassy Queen', 'Fierce Fiona', 'Chai Queen', 'Mystic Maya', 'Glow Girl',
+
+    // Cool & Fun Party Names
     'Neon Ninja', 'Spin Master', 'Daring Devil', 'Truth Seeker', 'Vibe Lord',
     'Disco King', 'Glitch Star', 'Whiskey Wizard', 'Cyber Punk', 'Cosmic Cow',
-    'Party Animal', 'Salty McSalt', 'Sassy Queen', 'Joker', 'Golden Spin',
-    'Rule Breaker', 'Mystery Guest', 'Wild Card', 'Llama Drama', 'Drama Queen',
-    'Meme Lord', 'Couch Potato', 'Speedy', 'Pancake', 'Noodle', 'Pickle',
-    'Gummy Bear', 'Pixel Hero', 'Ghost Rider', 'Space Cadet'
+    'Party Animal', 'Salty McSalt', 'Joker', 'Golden Spin', 'Rule Breaker',
+    'Mystery Guest', 'Wild Card', 'Llama Drama', 'Meme Lord', 'Couch Potato',
+    'Speedy', 'Pancake', 'Noodle', 'Pickle', 'Gummy Bear', 'Pixel Hero',
+    'Ghost Rider', 'Space Cadet'
   ];
 
   final Random _random = Random();
+
+  /// Gets a unique matching emoji for [name] that is NOT currently used by any player in the lobby.
+  String getMatchingEmojiForName(String name, {int? playerIndex}) {
+    Set<String> usedEmojis = {};
+    for (int i = 0; i < playerEmojisList.length; i++) {
+      if (playerIndex == null || i != playerIndex) {
+        usedEmojis.add(playerEmojisList[i]);
+      }
+    }
+
+    if (nameEmojiMap.containsKey(name)) {
+      String mappedEmoji = nameEmojiMap[name]!;
+      if (!usedEmojis.contains(mappedEmoji)) {
+        return mappedEmoji;
+      }
+    }
+
+    List<String> available = playerEmojis
+        .where((e) => !usedEmojis.contains(e))
+        .toList();
+
+    if (available.isNotEmpty) {
+      return available[_random.nextInt(available.length)];
+    }
+
+    return playerEmojis[playerIndex != null ? playerIndex % playerEmojis.length : 0];
+  }
+
+  /// Generates a random name guaranteed to be unique among active lobby players.
+  String getRandomUniqueName({String? currentName}) {
+    Set<String> existingNames = playerControllers
+        .map((c) => c.text.trim())
+        .where((name) => name.isNotEmpty && name != currentName)
+        .toSet();
+
+    List<String> available = randomNames
+        .where((name) => !existingNames.contains(name))
+        .toList();
+
+    if (available.isNotEmpty) {
+      return available[_random.nextInt(available.length)];
+    }
+
+    int count = 1;
+    while (existingNames.contains("Player $count")) {
+      count++;
+    }
+    return "Player $count";
+  }
 
   @override
   void onInit() {
@@ -58,16 +189,11 @@ class HomeController extends GetxController {
     int current = playerControllers.length;
     if (playerCount.value > current) {
       for (int i = current; i < playerCount.value; i++) {
-        String newName = randomNames[_random.nextInt(randomNames.length)];
-        int attempts = 0;
-        while (playerControllers.any((c) => c.text == newName) && attempts < 15) {
-          newName = randomNames[_random.nextInt(randomNames.length)];
-          attempts++;
-        }
+        String newName = getRandomUniqueName();
         playerControllers.add(TextEditingController(text: newName));
 
-        // Assign unique emoji & color
-        String newEmoji = playerEmojis[i % playerEmojis.length];
+        // Assign matching emoji & unique color
+        String newEmoji = getMatchingEmojiForName(newName);
         playerEmojisList.add(newEmoji);
         Color newColor = glowColors[i % glowColors.length];
         playerColorsList.add(newColor);
@@ -108,10 +234,10 @@ class HomeController extends GetxController {
     String trimmed = textToUse.trim();
     String finalName = trimmed.isNotEmpty
         ? trimmed
-        : randomNames[_random.nextInt(randomNames.length)];
+        : getRandomUniqueName();
 
     playerControllers.add(TextEditingController(text: finalName));
-    String newEmoji = playerEmojis[playerEmojisList.length % playerEmojis.length];
+    String newEmoji = getMatchingEmojiForName(finalName);
     playerEmojisList.add(newEmoji);
     Color newColor = glowColors[playerColorsList.length % glowColors.length];
     playerColorsList.add(newColor);
@@ -158,13 +284,14 @@ class HomeController extends GetxController {
 
   void randomizeName(int index) {
     if (index >= 0 && index < playerControllers.length) {
-      String newName = randomNames[_random.nextInt(randomNames.length)];
-      int attempts = 0;
-      while (playerControllers.any((c) => c.text == newName) && attempts < 15) {
-        newName = randomNames[_random.nextInt(randomNames.length)];
-        attempts++;
-      }
+      String newName = getRandomUniqueName(
+        currentName: playerControllers[index].text,
+      );
       playerControllers[index].text = newName;
+      if (index < playerEmojisList.length) {
+        playerEmojisList[index] = getMatchingEmojiForName(newName);
+        playerEmojisList.refresh();
+      }
     }
   }
 
