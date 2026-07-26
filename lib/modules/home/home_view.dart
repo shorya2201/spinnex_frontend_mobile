@@ -420,16 +420,16 @@ class HomeView extends GetView<HomeController> {
       ),
       child: Row(
         children: [
-          // Text Input Field Box
+          // Rounded Input Field Box matching reference screenshot
           Expanded(
             child: Container(
               height: 48,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(16),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.18),
+                  color: Colors.white.withOpacity(0.25),
                   width: 1,
                 ),
               ),
@@ -447,7 +447,12 @@ class HomeView extends GetView<HomeController> {
                 },
                 decoration: InputDecoration(
                   isDense: true,
+                  filled: false,
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
                   hintText: "Enter player name...",
                   hintStyle: TextStyle(
                     color: Colors.white.withOpacity(0.45),
@@ -459,7 +464,7 @@ class HomeView extends GetView<HomeController> {
           ),
           const SizedBox(width: 10),
 
-          // Green + Button Box
+          // Green + Action Button
           GestureDetector(
             onTap: () {
               controller.addPlayerWithInputName(
@@ -471,7 +476,7 @@ class HomeView extends GetView<HomeController> {
               height: 48,
               decoration: BoxDecoration(
                 color: const Color(0xFF39FF14).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: const Color(0xFF39FF14),
                   width: 1.5,
