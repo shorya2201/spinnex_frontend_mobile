@@ -14,11 +14,15 @@ class HomeController extends GetxController {
   var playerControllers = <TextEditingController>[].obs;
   var playerEmojisList = <String>[].obs;
   var playerColorsList = <Color>[].obs;
-  var selectedCategory = 'Party'.obs;
+  var selectedCategory = 'Party (Friends)'.obs;
   var isMusicOn = true.obs;
   var isLoading = false.obs;
 
-  final List<String> categories = ['Classic', 'Party', 'Spicy'];
+  final List<String> categories = [
+    'Classic (Family)',
+    'Party (Friends)',
+    'Spicy (Couples)'
+  ];
 
   static const List<Color> glowColors = [
     Color(0xFFFF0055), // Hot Crimson

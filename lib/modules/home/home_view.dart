@@ -93,12 +93,12 @@ class HomeView extends GetView<HomeController> {
                         ),
                       )
                     : SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         padding: EdgeInsets.only(
                           left: 14,
                           right: 14,
                           top: MediaQuery.of(context).padding.top + 60 + 10,
-                          bottom: 10,
+                          bottom: MediaQuery.of(context).padding.bottom + 85,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,9 +126,6 @@ class HomeView extends GetView<HomeController> {
                             ),
                             const SizedBox(height: 10),
                             _buildSettingsCard(),
-
-                            // Generous bottom inset ensuring full visibility above sticky button
-                            const SizedBox(height: 110),
                           ],
                         ),
                       ),
@@ -839,17 +836,17 @@ class HomeView extends GetView<HomeController> {
   // Category / Deck Selection Component
   Widget _buildCategorySelector() {
     final Map<String, Map<String, dynamic>> categoryDetails = {
-      'Classic': {
-        'icon': Icons.casino_rounded,
-        'tag': 'Fun & Casual',
+      'Classic (Family)': {
+        'icon': Icons.family_restroom_rounded,
+        'tag': 'Clean & Fun',
         'color': const Color(0xFF00FFFF),
       },
-      'Party': {
-        'icon': Icons.celebration_rounded,
+      'Party (Friends)': {
+        'icon': '🥂',
         'tag': 'Wild & Crazy',
         'color': const Color(0xFFFF007F),
       },
-      'Spicy': {
+      'Spicy (Couples)': {
         'icon': Icons.local_fire_department_rounded,
         'tag': 'Hot & Bold 18+',
         'color': const Color(0xFFFF4500),
@@ -901,18 +898,25 @@ class HomeView extends GetView<HomeController> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      details['icon'],
-                      color: isSelected ? accentColor : Colors.white60,
-                      size: 22,
-                    ),
+                    if (details['icon'] is String)
+                      Text(
+                        details['icon'] as String,
+                        style: const TextStyle(fontSize: 22),
+                      )
+                    else
+                      Icon(
+                        details['icon'] as IconData,
+                        color: isSelected ? accentColor : Colors.white60,
+                        size: 22,
+                      ),
                     const SizedBox(height: 4),
                     Text(
                       cat,
-                      maxLines: 1,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.orbitron(
-                        fontSize: 12,
+                        fontSize: 10,
                         fontWeight:
                             isSelected ? FontWeight.w800 : FontWeight.w600,
                         color: isSelected ? Colors.white : Colors.white70,
@@ -1189,7 +1193,7 @@ class HomeView extends GetView<HomeController> {
                 color: const Color(0xFF00FFFF),
                 title: "Pick Your Vibe Deck",
                 subtitle:
-                    "Choose from Classic (casual fun), Party (wild challenges), or Spicy (18+ bold truths & dares).",
+                    "Choose from Classic (Family), Party (Friends), or Spicy (Couples).",
               ),
               const SizedBox(height: 14),
               _buildRuleStep(

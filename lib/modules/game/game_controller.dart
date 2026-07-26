@@ -11,7 +11,7 @@ class GameController extends GetxController
   // Observables bound to GameView
   var players = <PlayerModel>[].obs;
   var questions = <Question>[].obs;
-  var selectedCategory = 'Classic'.obs;
+  var selectedCategory = 'Classic (Family)'.obs;
 
   var currentAngle = 0.0.obs;
   var selectedPlayerIndex = (-1).obs;

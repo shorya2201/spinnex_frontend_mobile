@@ -21,19 +21,18 @@ class ModeSpinner extends StatelessWidget {
   }
 
   CustomPainter _painterFor(String category) {
-    switch (category) {
-      case 'Party':
-        return const _DiscoBallPainter();
-      case 'Spicy':
-        return const _ChiliPepperPainter();
-      default:
-        return const _ClassicBottlePainter();
+    if (category.contains('Party')) {
+      return const _DiscoBallPainter();
+    } else if (category.contains('Spicy')) {
+      return const _ChiliPepperPainter();
+    } else {
+      return const _FamilyBottlePainter();
     }
   }
 }
 
-class _ClassicBottlePainter extends CustomPainter {
-  const _ClassicBottlePainter();
+class _FamilyBottlePainter extends CustomPainter {
+  const _FamilyBottlePainter();
 
   @override
   void paint(Canvas canvas, Size size) {

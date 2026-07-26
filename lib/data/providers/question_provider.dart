@@ -32,7 +32,15 @@ class QuestionProvider extends GetConnect {
   }
 
   Future<List<Question>> fetchQuestions(String category) async {
-    final response = await get('/questions', query: {'category': category});
+    String apiCategory = 'Classic';
+    if (category.contains('Party')) {
+      apiCategory = 'Party';
+    } else if (category.contains('Spicy')) {
+      apiCategory = 'Spicy';
+    } else {
+      apiCategory = 'Classic';
+    }
+    final response = await get('/questions', query: {'category': apiCategory});
 
     if (response.status.hasError) {
       return Future.error(response.statusText ?? "Error fetching questions");
