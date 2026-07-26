@@ -10,6 +10,8 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: _buildAppBar(context),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -23,12 +25,31 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
         child: SafeArea(
+          top: false,
           child: Stack(
             children: [
               // Ambient background glow effects
               Positioned(
-                top: -60,
-                left: -60,
+                top: -40,
+                left: -40,
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF007F).withOpacity(0.25),
+                        blurRadius: 100,
+                        spreadRadius: 30,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 60,
+                right: -50,
                 child: Container(
                   width: 200,
                   height: 200,
@@ -36,9 +57,9 @@ class HomeView extends GetView<HomeController> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF007F).withOpacity(0.18),
+                        color: const Color(0xFF00FFFF).withOpacity(0.20),
                         blurRadius: 90,
-                        spreadRadius: 20,
+                        spreadRadius: 25,
                       ),
                     ],
                   ),
@@ -73,15 +94,16 @@ class HomeView extends GetView<HomeController> {
                       )
                     : SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
+                        padding: EdgeInsets.only(
+                          left: 14,
+                          right: 14,
+                          top: MediaQuery.of(context).padding.top + 60 + 10,
+                          bottom: 10,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 8),
-                            _buildHeader(),
+                            _buildHeader(context),
                             const SizedBox(height: 20),
 
                              // Player Lobby Section
@@ -126,58 +148,365 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  // Header Component
-  Widget _buildHeader() {
-    return Center(
+  // Glassmorphic App Bar
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(60),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: AppBar(
+            backgroundColor: const Color(0xFF0D0015).withOpacity(0.65),
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            centerTitle: true,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 14),
+              child: Center(
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF007F), Color(0xFF00FFFF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF007F).withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.local_fire_department_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFF00FFFF), Color(0xFFFF007F), Color(0xFF39FF14)],
+                  ).createShader(bounds),
+                  child: Text(
+                    "SPINNEX",
+                    style: GoogleFonts.orbitron(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2.8,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFF007F).withOpacity(0.3),
+                        const Color(0xFF00FFFF).withOpacity(0.2),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color(0xFFFF007F).withOpacity(0.7),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    "PARTY",
+                    style: GoogleFonts.orbitron(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFFF007F),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              // Audio Toggle Button
+              Obx(
+                () => GestureDetector(
+                  onTap: () => controller.isMusicOn.toggle(),
+                  child: Tooltip(
+                    message: controller.isMusicOn.value
+                        ? "Audio Enabled"
+                        : "Audio Muted",
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 36,
+                      height: 36,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: controller.isMusicOn.value
+                            ? const Color(0xFF39FF14).withOpacity(0.15)
+                            : Colors.white.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: controller.isMusicOn.value
+                              ? const Color(0xFF39FF14)
+                              : Colors.white.withOpacity(0.2),
+                          width: 1.2,
+                        ),
+                        boxShadow: controller.isMusicOn.value
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF39FF14).withOpacity(0.4),
+                                  blurRadius: 8,
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Icon(
+                        controller.isMusicOn.value
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_off_rounded,
+                        color: controller.isMusicOn.value
+                            ? const Color(0xFF39FF14)
+                            : Colors.white54,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // How to Play Info Button
+              GestureDetector(
+                onTap: () => _showHowToPlayModal(context),
+                child: Tooltip(
+                  message: "How to Play",
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    margin: const EdgeInsets.only(right: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00FFFF).withOpacity(0.12),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF00FFFF).withOpacity(0.6),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF00FFFF).withOpacity(0.3),
+                          blurRadius: 8,
+                        )
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.help_outline_rounded,
+                      color: Color(0xFF00FFFF),
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Redesigned Top Header Banner Component
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFF007F).withOpacity(0.15),
+            const Color(0xFF8B00FF).withOpacity(0.12),
+            const Color(0xFF00FFFF).withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFFF007F).withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF007F).withOpacity(0.15),
+            blurRadius: 20,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
       child: Column(
         children: [
+          // Top Animated Glow Badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF007F), Color(0xFF00FFFF)],
+                colors: [Color(0xFFFF007F), Color(0xFF9D4EDD), Color(0xFF00FFFF)],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF007F).withOpacity(0.5),
-                  blurRadius: 15,
+                  color: const Color(0xFFFF007F).withOpacity(0.6),
+                  blurRadius: 16,
                   spreadRadius: 1,
                 ),
               ],
             ),
-            child: Text(
-              "SPINNEX PARTY",
-              style: GoogleFonts.orbitron(
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2.5,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            "Truth or Dare",
-            style: GoogleFonts.righteous(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: const Color(0xFF00FFFF).withOpacity(0.8),
-                  blurRadius: 12,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.bolt_rounded,
+                  color: Colors.white,
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  "NIGHTLIFE & PARTY EDITION",
+                  style: GoogleFonts.orbitron(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2.2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.bolt_rounded,
+                  color: Colors.white,
+                  size: 14,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 12),
+
+          // Glowing Main Title
+          ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xFF00FFFF),
+                Color(0xFFFF007F),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ).createShader(bounds),
+            child: Text(
+              "Truth or Dare",
+              style: GoogleFonts.righteous(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: const Color(0xFF00FFFF).withOpacity(0.9),
+                    blurRadius: 16,
+                  ),
+                  Shadow(
+                    color: const Color(0xFFFF007F).withOpacity(0.7),
+                    blurRadius: 24,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+
+          // Catchy Subtitle
           Text(
-            "Assemble your squad & spin the bottle!",
+            "Assemble your squad, spin the bottle & unveil secrets! 🔥",
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.7),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.85),
               letterSpacing: 0.3,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Quick Highlights Chips Row
+          _buildQuickHighlightsRow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickHighlightsRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildHighlightChip(
+            icon: Icons.groups_rounded,
+            color: const Color(0xFF00FFFF),
+            text: "2-12 Squad",
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildHighlightChip(
+            icon: Icons.style_rounded,
+            color: const Color(0xFFFF007F),
+            text: "3 Decks",
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildHighlightChip(
+            icon: Icons.auto_awesome_rounded,
+            color: const Color(0xFF39FF14),
+            text: "Instant Spin",
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHighlightChip({
+    required IconData icon,
+    required Color color,
+    required String text,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: color.withOpacity(0.35),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.orbitron(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -767,6 +1096,194 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showHowToPlayModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D031A),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(
+              color: const Color(0xFF00FFFF).withOpacity(0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.8),
+                blurRadius: 25,
+                offset: const Offset(0, -8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Modal Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00FFFF).withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.help_outline_rounded,
+                          color: Color(0xFF00FFFF),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "HOW TO PLAY",
+                        style: GoogleFonts.orbitron(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white70,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Rules Steps
+              _buildRuleStep(
+                number: "1",
+                color: const Color(0xFFFF007F),
+                title: "Add Squad Players",
+                subtitle:
+                    "Enter names or tap the dice 🎲 to generate unique avatars & glow colors for your squad.",
+              ),
+              const SizedBox(height: 14),
+              _buildRuleStep(
+                number: "2",
+                color: const Color(0xFF00FFFF),
+                title: "Pick Your Vibe Deck",
+                subtitle:
+                    "Choose from Classic (casual fun), Party (wild challenges), or Spicy (18+ bold truths & dares).",
+              ),
+              const SizedBox(height: 14),
+              _buildRuleStep(
+                number: "3",
+                color: const Color(0xFF39FF14),
+                title: "Spin & Challenge",
+                subtitle:
+                    "Tap START GAME, spin the bottle 🍾 to select a player, and choose Truth or Dare!",
+              ),
+              const SizedBox(height: 24),
+
+              // Close Button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: Text(
+                    "GOT IT, LET'S PLAY! 🔥",
+                    style: GoogleFonts.orbitron(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRuleStep({
+    required String number,
+    required Color color,
+    required String title,
+    required String subtitle,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            shape: BoxShape.circle,
+            border: Border.all(color: color, width: 1.5),
+          ),
+          child: Text(
+            number,
+            style: GoogleFonts.orbitron(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 12,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

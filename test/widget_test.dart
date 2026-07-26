@@ -19,11 +19,11 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
-    // Verify that we are on the game setup screen.
-    expect(find.text('GAME SETUP'), findsOneWidget);
-    expect(find.text('NUMBER OF PLAYERS'), findsOneWidget);
-    expect(find.text('PLAYER NAMES'), findsOneWidget);
+    // Verify that we are on the home screen.
+    expect(find.text('SPINNEX'), findsOneWidget);
+    expect(find.text('Truth or Dare'), findsOneWidget);
     expect(find.text('SELECT DECK'), findsOneWidget);
-    expect(find.text('START THE SPIN'), findsOneWidget);
+    expect(find.text('START GAME'), findsOneWidget);
+    expect(find.text('SETTINGS'), findsOneWidget);
   });
 }
