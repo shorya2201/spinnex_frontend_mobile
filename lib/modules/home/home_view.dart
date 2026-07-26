@@ -106,17 +106,17 @@ class HomeView extends GetView<HomeController> {
                             _buildHeader(context),
                             const SizedBox(height: 20),
 
-                             // Player Lobby Section
-                             _buildLobbySection(context),
-                             const SizedBox(height: 24),
-
                             // Category / Deck Selection
                             _buildSectionHeader(
-                              title: "SELECT DECK",
+                              title: "SELECT CATEGORY",
                               icon: Icons.style_rounded,
                             ),
                             const SizedBox(height: 10),
                             _buildCategorySelector(),
+                            const SizedBox(height: 24),
+
+                            // Player Lobby Section
+                            _buildLobbySection(context),
                             const SizedBox(height: 24),
 
                             // Settings & Utilities
@@ -837,7 +837,7 @@ class HomeView extends GetView<HomeController> {
   Widget _buildCategorySelector() {
     final Map<String, Map<String, dynamic>> categoryDetails = {
       'Classic (Family)': {
-        'icon': Icons.family_restroom_rounded,
+        'icon': '🏠',
         'tag': 'Clean & Fun',
         'color': const Color(0xFF00FFFF),
       },
@@ -847,7 +847,7 @@ class HomeView extends GetView<HomeController> {
         'color': const Color(0xFFFF007F),
       },
       'Spicy (Couples)': {
-        'icon': Icons.local_fire_department_rounded,
+        'icon': '🌶️',
         'tag': 'Hot & Bold 18+',
         'color': const Color(0xFFFF4500),
       },
@@ -858,7 +858,7 @@ class HomeView extends GetView<HomeController> {
         bool isSelected = controller.selectedCategory.value == cat;
         var details = categoryDetails[cat] ??
             {
-              'icon': Icons.star,
+              'icon': '⭐',
               'tag': 'Deck',
               'color': const Color(0xFF00FFFF),
             };
@@ -898,18 +898,43 @@ class HomeView extends GetView<HomeController> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (details['icon'] is String)
-                      Text(
-                        details['icon'] as String,
-                        style: const TextStyle(fontSize: 22),
-                      )
-                    else
-                      Icon(
-                        details['icon'] as IconData,
-                        color: isSelected ? accentColor : Colors.white60,
-                        size: 22,
+                    Container(
+                      width: 38,
+                      height: 38,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? accentColor.withOpacity(0.25)
+                            : Colors.white.withOpacity(0.06),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected
+                              ? accentColor
+                              : Colors.white.withOpacity(0.15),
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withOpacity(0.5),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                )
+                              ]
+                            : [],
                       ),
-                    const SizedBox(height: 4),
+                      child: details['icon'] is String
+                          ? Text(
+                              details['icon'] as String,
+                              style: const TextStyle(fontSize: 19),
+                            )
+                          : Icon(
+                              details['icon'] as IconData,
+                              color: isSelected ? accentColor : Colors.white60,
+                              size: 19,
+                            ),
+                    ),
+                    const SizedBox(height: 6),
                     Text(
                       cat,
                       maxLines: 2,
