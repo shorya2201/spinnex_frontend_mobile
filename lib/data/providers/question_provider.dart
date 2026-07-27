@@ -5,6 +5,9 @@ import '../models/question_model.dart';
 class QuestionProvider extends GetConnect {
   @override
   void onInit() {
+    // Bypass SSL certificate check (required for self-signed/untrusted issuer certificates on mobile)
+    allowAutoSignedCert = true;
+
     // Set to live Render backend
     baseUrl = 'https://spinnex-backend-dev.onrender.com/api';
 
