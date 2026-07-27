@@ -204,8 +204,8 @@ class HomeController extends GetxController {
       }
     } else if (playerCount.value < current) {
       for (int i = current - 1; i >= playerCount.value; i--) {
-        playerControllers[i].dispose();
-        playerControllers.removeAt(i);
+        var removed = playerControllers.removeAt(i);
+        removed.dispose();
         if (i < playerEmojisList.length) {
           playerEmojisList.removeAt(i);
         }
@@ -266,8 +266,8 @@ class HomeController extends GetxController {
 
   void removePlayerAt(int index) {
     if (playerCount.value > 2 && index >= 0 && index < playerControllers.length) {
-      playerControllers[index].dispose();
-      playerControllers.removeAt(index);
+      var removed = playerControllers.removeAt(index);
+      removed.dispose();
       if (index < playerEmojisList.length) {
         playerEmojisList.removeAt(index);
       }
@@ -353,7 +353,9 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     newPlayerInputController.dispose();
-    for (var controller in playerControllers) {
+    var list = List<TextEditingController>.from(playerControllers);
+    playerControllers.clear();
+    for (var controller in list) {
       controller.dispose();
     }
     super.onClose();

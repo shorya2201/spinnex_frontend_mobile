@@ -11,6 +11,6 @@ class HomeBinding extends Bindings {
     Get.lazyPut(() => QuestionRepository(provider: Get.find()));
 
     // Initialize Controller
-    Get.lazyPut(() => HomeController(repository: Get.find()));
+    Get.lazyPut(() => HomeController(repository: Get.find()), fenix: true);
   }
 }

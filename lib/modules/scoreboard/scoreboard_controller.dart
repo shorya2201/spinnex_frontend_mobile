@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../../data/models/player_model.dart';
+import '../../routes/app_routes.dart';
 
 class ScoreboardController extends GetxController {
   // Reactive list of players
@@ -28,7 +29,7 @@ class ScoreboardController extends GetxController {
   }
 
   void playAgain() {
-    // Navigate back to home and clear the navigation stack
-    Get.offAllNamed('/home');
+    // Navigate back to existing home route
+    Get.until((route) => route.settings.name == Routes.HOME || route.isFirst);
   }
 }
