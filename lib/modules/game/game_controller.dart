@@ -20,6 +20,14 @@ class GameController extends GetxController
   var showActionButtons = false.obs;
   var isSpinning = false.obs;
 
+  // Shuffle Bag & Boundary Duplicate Protection state
+  final List<int> _playerDrawBag = [];
+  int _lastSelectedPlayerIndex = -1;
+
+  // Non-repeating Question Draw Decks
+  final List<Question> _truthQuestionDeck = [];
+  final List<Question> _dareQuestionDeck = [];
+
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -50,25 +58,39 @@ class GameController extends GetxController
       if (_animationController.isAnimating) {
         currentAngle.value = _animation.value;
       }
-      /* Commented out spin angle listener:
-      if (players.isNotEmpty && (selectedSelectorMode.value == 'Bottle' || selectedSelectorMode.value == 'Wheel')) {
-        double normalizedAngle = currentAngle.value % (2 * pi);
-        double slice = 2 * pi / players.length;
-        highlightedPlayerIndex.value = (normalizedAngle / slice).round() % players.length;
-      }
-      */
-    });
-
-    _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _onSpinComplete();
-      }
     });
   }
 
   void setSelectorMode(String mode) {
     if (isSpinning.value) return;
     selectedSelectorMode.value = mode;
+  }
+
+  /// Draws the next player index using a Shuffle Bag (Deck Drawing) algorithm.
+  /// Guarantees every player is selected once per round before anyone is picked again.
+  /// Boundary Protection prevents the same player from being selected twice in a row,
+  /// even across bag reset boundaries.
+  int _drawNextPlayerIndex(Random random) {
+    if (players.isEmpty) return 0;
+    if (players.length == 1) return 0;
+
+    // Refill and shuffle bag when empty
+    if (_playerDrawBag.isEmpty) {
+      _playerDrawBag.addAll(List<int>.generate(players.length, (index) => index));
+      _playerDrawBag.shuffle(random);
+
+      // Boundary Protection: If first player in new bag matches last selected player, swap it!
+      if (_playerDrawBag.first == _lastSelectedPlayerIndex && _playerDrawBag.length > 1) {
+        int swapIndex = 1 + random.nextInt(_playerDrawBag.length - 1);
+        int temp = _playerDrawBag[0];
+        _playerDrawBag[0] = _playerDrawBag[swapIndex];
+        _playerDrawBag[swapIndex] = temp;
+      }
+    }
+
+    int nextIndex = _playerDrawBag.removeAt(0);
+    _lastSelectedPlayerIndex = nextIndex;
+    return nextIndex;
   }
 
   void triggerSelection() {
@@ -81,70 +103,13 @@ class GameController extends GetxController
     highlightedPlayerIndex.value = -1;
 
     final random = Random();
-
-    /* Commented out spin/radar angular options:
-    if (selectedSelectorMode.value == 'Bottle' || selectedSelectorMode.value == 'Wheel') {
-      _runAngularSpin(random);
-    } else if (selectedSelectorMode.value == 'Radar') {
-      _runRadarPulseSelection(random);
-    } else {
-    */
     _runJackpotSelection(random);
   }
 
-  /* Commented out spin option:
-  void _runAngularSpin(Random random) {
-    double extraSpins = (random.nextInt(4) + 4) * 2 * pi;
-    double stopAngle = currentAngle.value + extraSpins + (random.nextDouble() * 2 * pi);
-
-    _animation = Tween<double>(begin: currentAngle.value, end: stopAngle).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCirc),
-    );
-
-    _animationController.reset();
-    _animationController.forward();
-  }
-  */
-
-  /* Commented out radar pulse option:
-  void _runRadarPulseSelection(Random random) async {
-    int targetIndex = random.nextInt(players.length);
-    int totalSteps = 25 + random.nextInt(10);
-    int currentStep = 0;
-
-    _animation = Tween<double>(begin: currentAngle.value, end: currentAngle.value + 6 * pi).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
-    );
-    _animationController.reset();
-    _animationController.forward();
-
-    while (currentStep < totalSteps) {
-      currentStep++;
-      if (currentStep == totalSteps) {
-        highlightedPlayerIndex.value = targetIndex;
-      } else {
-        highlightedPlayerIndex.value = (currentStep) % players.length;
-      }
-
-      int delay = 50 + ((currentStep * currentStep * 15) ~/ totalSteps);
-      await Future.delayed(Duration(milliseconds: delay));
-      if (!isSpinning.value) return;
-    }
-
-    _onSpinComplete(precalculatedIndex: targetIndex);
-  }
-  */
-
   void _runJackpotSelection(Random random) async {
-    int targetIndex = random.nextInt(players.length);
+    int targetIndex = _drawNextPlayerIndex(random);
     int totalSteps = 25 + random.nextInt(10);
     int currentStep = 0;
-
-    _animation = Tween<double>(begin: currentAngle.value, end: currentAngle.value + 6 * pi).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
-    );
-    _animationController.reset();
-    _animationController.forward();
 
     while (currentStep < totalSteps) {
       currentStep++;
@@ -173,7 +138,6 @@ class GameController extends GetxController
       selectedPlayerIndex.value = precalculatedIndex;
       highlightedPlayerIndex.value = precalculatedIndex;
     } else {
-      // Calculate which player it landed on from currentAngle
       double normalizedAngle = currentAngle.value % (2 * pi);
       double slice = 2 * pi / players.length;
 
@@ -206,8 +170,7 @@ class GameController extends GetxController
           // Update the player's score safely
           var updatedPlayer = players[selectedPlayerIndex.value];
           updatedPlayer.score += points;
-          players[selectedPlayerIndex.value] =
-              updatedPlayer; // Triggers UI update
+          players[selectedPlayerIndex.value] = updatedPlayer; // Triggers UI update
 
           // Reset the board for the next spin
           showActionButtons.value = false;
@@ -218,17 +181,23 @@ class GameController extends GetxController
   }
 
   Question? getChallenge(String type) {
-    var filtered = questions
-        .where((q) => q.type.toUpperCase() == type.toUpperCase())
-        .toList();
-    if (filtered.isEmpty) return null;
+    final isTruth = type.toUpperCase() == 'TRUTH';
+    final deck = isTruth ? _truthQuestionDeck : _dareQuestionDeck;
 
-    filtered.shuffle();
-    return filtered.first;
+    if (deck.isEmpty) {
+      var available = questions
+          .where((q) => q.type.toUpperCase() == type.toUpperCase())
+          .toList();
+      if (available.isEmpty) return null;
+
+      available.shuffle();
+      deck.addAll(available);
+    }
+
+    return deck.removeAt(0);
   }
 
   void endGame() {
-    // Navigate to scoreboard and pass the players list
     Get.offAllNamed(Routes.SCOREBOARD, arguments: players.toList());
   }
 
@@ -238,3 +207,4 @@ class GameController extends GetxController
     super.onClose();
   }
 }
+
