@@ -386,20 +386,6 @@ class JackpotDeckWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Corner Cyber Grid Lines
-          Positioned(
-            top: 6,
-            left: 10,
-            child: Text(
-              "JACKPOT CORE",
-              style: GoogleFonts.orbitron(
-                fontSize: 6.5,
-                fontWeight: FontWeight.w900,
-                color: const Color(0xFFBF5FFF),
-                letterSpacing: 0.8,
-              ),
-            ),
-          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

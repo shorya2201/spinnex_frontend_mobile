@@ -352,7 +352,7 @@ class GameView extends GetView<GameController> {
           text = "TAP RADAR TO SCAN ⚡";
           icon = Icons.radar_rounded;
         } else if (mode == 'Jackpot') {
-          text = "TAP CARDS TO DRAW 🃏";
+          text = "TAP CARD TO DRAW 🃏";
           icon = Icons.style_rounded;
         } else if (mode == 'Wheel') {
           text = "TAP WHEEL TO SPIN 🎡";
