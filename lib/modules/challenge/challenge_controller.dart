@@ -1,15 +1,23 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/models/player_model.dart';
 import '../../data/models/question_model.dart';
 
 class ChallengeController extends GetxController {
   late PlayerModel player;
-  late Question question; // <- FIXED: Changed from QuestionModel to Question
+  late Question question;
   late Function(int) onComplete;
 
   var timeLeft = 45.obs;
   Timer? _timer;
+
+  bool get isLowTime => timeLeft.value <= 10;
+  bool get isDare => question.type.toUpperCase() == 'DARE';
+  Color get accentColor => isDare ? const Color(0xFFFF007F) : const Color(0xFF00FFFF);
+  String get typeLabel => isDare ? 'DARE CHALLENGE' : 'TRUTH QUESTION';
+  String get typeIcon => isDare ? '🔥' : '👁️';
+  int get rewardPoints => isDare ? 2 : 1;
 
   @override
   void onInit() {
@@ -33,8 +41,7 @@ class ChallengeController extends GetxController {
   }
 
   void completeChallenge() {
-    int points = question.type == 'DARE' ? 2 : 1;
-    onComplete(points);
+    onComplete(rewardPoints);
     Get.back();
   }
 
@@ -49,3 +56,4 @@ class ChallengeController extends GetxController {
     super.onClose();
   }
 }
+
