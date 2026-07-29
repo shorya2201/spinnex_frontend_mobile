@@ -505,8 +505,8 @@ class GameView extends GetView<GameController> {
         */
         case 'Jackpot':
         default:
-          width = 140;
-          height = 140;
+          width = 110;
+          height = 110;
           childWidget = JackpotDeckWidget(
             activePlayer: activePlayer,
             isSpinning: controller.isSpinning.value,

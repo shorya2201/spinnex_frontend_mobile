@@ -354,10 +354,10 @@ class JackpotDeckWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: 140,
-      height: 140,
+      width: 110,
+      height: 110,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
             const Color(0xFFBF5FFF).withValues(alpha: 0.3),
@@ -371,15 +371,15 @@ class JackpotDeckWidget extends StatelessWidget {
           color: activePlayer != null
               ? activePlayer!.color
               : const Color(0xFFBF5FFF),
-          width: 2.5,
+          width: 2.0,
         ),
         boxShadow: [
           BoxShadow(
             color: activePlayer != null
                 ? activePlayer!.color.withValues(alpha: 0.6)
                 : const Color(0xFFBF5FFF).withValues(alpha: 0.35),
-            blurRadius: isSpinning ? 25 : 12,
-            spreadRadius: isSpinning ? 5 : 1,
+            blurRadius: isSpinning ? 20 : 10,
+            spreadRadius: isSpinning ? 4 : 1,
           ),
         ],
       ),
@@ -388,15 +388,15 @@ class JackpotDeckWidget extends StatelessWidget {
         children: [
           // Corner Cyber Grid Lines
           Positioned(
-            top: 8,
-            left: 12,
+            top: 6,
+            left: 10,
             child: Text(
               "JACKPOT CORE",
               style: GoogleFonts.orbitron(
-                fontSize: 7.5,
+                fontSize: 6.5,
                 fontWeight: FontWeight.w900,
                 color: const Color(0xFFBF5FFF),
-                letterSpacing: 1.0,
+                letterSpacing: 0.8,
               ),
             ),
           ),
@@ -414,20 +414,23 @@ class JackpotDeckWidget extends StatelessWidget {
                     children: [
                       Text(
                         activePlayer?.emoji ?? "🃏",
-                        style: const TextStyle(fontSize: 34),
+                        style: const TextStyle(fontSize: 26),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        activePlayer != null
-                            ? activePlayer!.name.toUpperCase()
-                            : (isSpinning ? "SHUFFLING..." : "TAP TO DRAW"),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.orbitron(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 1.1,
+                      const SizedBox(height: 2),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Text(
+                          activePlayer != null
+                              ? activePlayer!.name.toUpperCase()
+                              : (isSpinning ? "SHUFFLING..." : "TAP TO DRAW"),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.orbitron(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.8,
+                          ),
                         ),
                       ),
                     ],
