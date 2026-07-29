@@ -554,6 +554,7 @@ class GameView extends GetView<GameController> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutBack,
+      transformAlignment: Alignment.topCenter,
       transform: isHighlighted
           ? (Matrix4.identity()..scale(1.22))
           : Matrix4.identity(),
