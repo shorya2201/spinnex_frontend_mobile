@@ -12,9 +12,11 @@ class GameController extends GetxController
   var players = <PlayerModel>[].obs;
   var questions = <Question>[].obs;
   var selectedCategory = 'Classic (Family)'.obs;
+  var selectedSelectorMode = 'Jackpot'.obs; // Active mode: 'Jackpot' (Options commented out: 'Bottle', 'Wheel', 'Radar')
 
   var currentAngle = 0.0.obs;
   var selectedPlayerIndex = (-1).obs;
+  var highlightedPlayerIndex = (-1).obs;
   var showActionButtons = false.obs;
   var isSpinning = false.obs;
 
@@ -35,14 +37,26 @@ class GameController extends GetxController
       }
     }
 
-    // 2. Initialize Animation Controller for the Bottle Spin
+    // 2. Initialize Animation Controller for selector animations
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4), // Spin duration
+      duration: const Duration(seconds: 4),
     );
 
+    // Default dummy animation to prevent LateInitializationError
+    _animation = Tween<double>(begin: 0.0, end: 0.0).animate(_animationController);
+
     _animationController.addListener(() {
-      currentAngle.value = _animation.value;
+      if (_animationController.isAnimating) {
+        currentAngle.value = _animation.value;
+      }
+      /* Commented out spin angle listener:
+      if (players.isNotEmpty && (selectedSelectorMode.value == 'Bottle' || selectedSelectorMode.value == 'Wheel')) {
+        double normalizedAngle = currentAngle.value % (2 * pi);
+        double slice = 2 * pi / players.length;
+        highlightedPlayerIndex.value = (normalizedAngle / slice).round() % players.length;
+      }
+      */
     });
 
     _animationController.addStatusListener((status) {
@@ -52,44 +66,122 @@ class GameController extends GetxController
     });
   }
 
-  void spinBottle() {
+  void setSelectorMode(String mode) {
     if (isSpinning.value) return;
+    selectedSelectorMode.value = mode;
+  }
+
+  void triggerSelection() {
+    if (isSpinning.value) return;
+    if (players.isEmpty) return;
 
     isSpinning.value = true;
     showActionButtons.value = false;
     selectedPlayerIndex.value = -1;
+    highlightedPlayerIndex.value = -1;
 
-    // Randomize the spin distance
     final random = Random();
-    // Spin randomly between 4 to 7 full circles + an extra random angle
-    double extraSpins = (random.nextInt(4) + 4) * 2 * pi;
-    double stopAngle =
-        currentAngle.value + extraSpins + (random.nextDouble() * 2 * pi);
 
-    _animation = Tween<double>(begin: currentAngle.value, end: stopAngle)
-        .animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves
-                .easeOutCirc, // Creates a realistic friction slowing down effect
-          ),
-        );
+    /* Commented out spin/radar angular options:
+    if (selectedSelectorMode.value == 'Bottle' || selectedSelectorMode.value == 'Wheel') {
+      _runAngularSpin(random);
+    } else if (selectedSelectorMode.value == 'Radar') {
+      _runRadarPulseSelection(random);
+    } else {
+    */
+    _runJackpotSelection(random);
+  }
+
+  /* Commented out spin option:
+  void _runAngularSpin(Random random) {
+    double extraSpins = (random.nextInt(4) + 4) * 2 * pi;
+    double stopAngle = currentAngle.value + extraSpins + (random.nextDouble() * 2 * pi);
+
+    _animation = Tween<double>(begin: currentAngle.value, end: stopAngle).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCirc),
+    );
 
     _animationController.reset();
     _animationController.forward();
   }
+  */
 
-  void _onSpinComplete() {
+  /* Commented out radar pulse option:
+  void _runRadarPulseSelection(Random random) async {
+    int targetIndex = random.nextInt(players.length);
+    int totalSteps = 25 + random.nextInt(10);
+    int currentStep = 0;
+
+    _animation = Tween<double>(begin: currentAngle.value, end: currentAngle.value + 6 * pi).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+    _animationController.reset();
+    _animationController.forward();
+
+    while (currentStep < totalSteps) {
+      currentStep++;
+      if (currentStep == totalSteps) {
+        highlightedPlayerIndex.value = targetIndex;
+      } else {
+        highlightedPlayerIndex.value = (currentStep) % players.length;
+      }
+
+      int delay = 50 + ((currentStep * currentStep * 15) ~/ totalSteps);
+      await Future.delayed(Duration(milliseconds: delay));
+      if (!isSpinning.value) return;
+    }
+
+    _onSpinComplete(precalculatedIndex: targetIndex);
+  }
+  */
+
+  void _runJackpotSelection(Random random) async {
+    int targetIndex = random.nextInt(players.length);
+    int totalSteps = 25 + random.nextInt(10);
+    int currentStep = 0;
+
+    _animation = Tween<double>(begin: currentAngle.value, end: currentAngle.value + 6 * pi).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+    _animationController.reset();
+    _animationController.forward();
+
+    while (currentStep < totalSteps) {
+      currentStep++;
+      if (currentStep == totalSteps) {
+        highlightedPlayerIndex.value = targetIndex;
+      } else {
+        highlightedPlayerIndex.value = (currentStep) % players.length;
+      }
+
+      int delay = 40 + ((currentStep * currentStep * 12) ~/ totalSteps);
+      await Future.delayed(Duration(milliseconds: delay));
+      if (!isSpinning.value) return;
+    }
+
+    _onSpinComplete(precalculatedIndex: targetIndex);
+  }
+
+  void spinBottle() {
+    triggerSelection();
+  }
+
+  void _onSpinComplete({int? precalculatedIndex}) {
     isSpinning.value = false;
 
-    // Calculate which player it landed on
-    double normalizedAngle = currentAngle.value % (2 * pi);
-    double slice = 2 * pi / players.length;
+    if (precalculatedIndex != null) {
+      selectedPlayerIndex.value = precalculatedIndex;
+      highlightedPlayerIndex.value = precalculatedIndex;
+    } else {
+      // Calculate which player it landed on from currentAngle
+      double normalizedAngle = currentAngle.value % (2 * pi);
+      double slice = 2 * pi / players.length;
 
-    // Round to the nearest "slice" of the circle
-    int landedIndex = (normalizedAngle / slice).round() % players.length;
+      int landedIndex = (normalizedAngle / slice).round() % players.length;
+      selectedPlayerIndex.value = landedIndex;
+      highlightedPlayerIndex.value = landedIndex;
+    }
 
-    selectedPlayerIndex.value = landedIndex;
     showActionButtons.value = true;
   }
 

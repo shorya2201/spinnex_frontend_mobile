@@ -7,6 +7,7 @@ import '../../routes/app_routes.dart';
 import '../../data/models/player_model.dart';
 import 'game_controller.dart';
 import 'widgets/mode_spinner.dart';
+import 'widgets/selector_widgets.dart';
 
 class GameView extends GetView<GameController> {
   const GameView({super.key});
@@ -83,7 +84,12 @@ class GameView extends GetView<GameController> {
                     // Dynamic Real-time Game Status Guidance Banner
                     _buildGameStatusBanner(),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
+
+                    // Selector Mode Switcher Bar (Bottle, Roulette, Radar, Jackpot)
+                    // _buildSelectorModeSwitcherBar(),
+
+                    const SizedBox(height: 6),
 
                     // Central Spin Arena (Players + Mode Bottle Spinner)
                     Expanded(
@@ -110,11 +116,11 @@ class GameView extends GetView<GameController> {
                               children: [
                                 // Outer Arena Glow Ring
                                 Positioned(
-                                  left: centerX - radius - 15,
-                                  top: centerY - radius - 15,
+                                  left: centerX - radius,
+                                  top: centerY - radius,
                                   child: Container(
-                                    width: (radius * 2) + 30,
-                                    height: (radius * 2) + 30,
+                                    width: radius * 2,
+                                    height: radius * 2,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
@@ -141,13 +147,13 @@ class GameView extends GetView<GameController> {
                                           index;
                                   // Radial offset position calculation
                                   double nodeWidth = 80;
-                                  double nodeHeight = 85;
+                                  double avatarRadius = 27; // Half of avatar circle height (54)
                                   double x = centerX +
                                       radius * sin(angle) -
                                       (nodeWidth / 2);
                                   double y = centerY -
                                       radius * cos(angle) -
-                                      (nodeHeight / 2);
+                                      avatarRadius;
 
                                   bool isWinner = controller
                                           .selectedPlayerIndex.value ==
@@ -169,40 +175,8 @@ class GameView extends GetView<GameController> {
                                   );
                                 }),
 
-                                // Mode-specific Interactive Spinner Bottle in Center
-                                Positioned(
-                                  left: centerX -
-                                      ModeSpinner.spinnerSize.width / 2,
-                                  top: centerY -
-                                      ModeSpinner.spinnerSize.height / 2,
-                                  child: GestureDetector(
-                                    onTap: controller.spinBottle,
-                                    child: AnimatedContainer(
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        boxShadow: controller.isSpinning.value
-                                            ? [
-                                                BoxShadow(
-                                                  color: const Color(0xFF00FFFF)
-                                                      .withValues(alpha: 0.4),
-                                                  blurRadius: 25,
-                                                  spreadRadius: 5,
-                                                ),
-                                              ]
-                                            : [],
-                                      ),
-                                      child: Transform.rotate(
-                                        angle: controller.currentAngle.value,
-                                        child: ModeSpinner(
-                                          category:
-                                              controller.selectedCategory.value,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Dynamic Central Selector Component
+                                _buildCentralSelector(centerX, centerY),
                               ],
                             );
                           });
@@ -350,10 +324,22 @@ class GameView extends GetView<GameController> {
       String text;
       IconData icon;
       Color accentColor;
+      String mode = controller.selectedSelectorMode.value;
 
       if (controller.isSpinning.value) {
-        text = "SPINNING THE BOTTLE...";
-        icon = Icons.sync_rounded;
+        if (mode == 'Radar') {
+          text = "SCANNING TARGETS...";
+          icon = Icons.radar_rounded;
+        } else if (mode == 'Jackpot') {
+          text = "SHUFFLING CARDS...";
+          icon = Icons.style_rounded;
+        } else if (mode == 'Wheel') {
+          text = "SPINNING ROULETTE...";
+          icon = Icons.motion_photos_on_rounded;
+        } else {
+          text = "SPINNING THE BOTTLE...";
+          icon = Icons.sync_rounded;
+        }
         accentColor = const Color(0xFF00FFFF);
       } else if (controller.selectedPlayerIndex.value != -1) {
         int index = controller.selectedPlayerIndex.value;
@@ -362,8 +348,19 @@ class GameView extends GetView<GameController> {
         icon = Icons.local_fire_department_rounded;
         accentColor = controller.players[index].color;
       } else {
-        text = "TAP BOTTLE TO SPIN 🍾";
-        icon = Icons.touch_app_rounded;
+        if (mode == 'Radar') {
+          text = "TAP RADAR TO SCAN ⚡";
+          icon = Icons.radar_rounded;
+        } else if (mode == 'Jackpot') {
+          text = "TAP CARDS TO DRAW 🃏";
+          icon = Icons.style_rounded;
+        } else if (mode == 'Wheel') {
+          text = "TAP WHEEL TO SPIN 🎡";
+          icon = Icons.motion_photos_on_rounded;
+        } else {
+          text = "TAP BOTTLE TO SPIN 🍾";
+          icon = Icons.touch_app_rounded;
+        }
         accentColor = const Color(0xFF39FF14);
       }
 
@@ -409,6 +406,140 @@ class GameView extends GetView<GameController> {
     });
   }
 
+  // Interactive Selector Mode Switcher HUD
+  Widget _buildSelectorModeSwitcherBar() {
+    final modes = [
+      // {'id': 'Bottle', 'label': 'Bottle', 'icon': '🍾'}, // Commented out
+      // {'id': 'Wheel', 'label': 'Roulette', 'icon': '🎡'}, // Commented out
+      // {'id': 'Radar', 'label': 'Radar', 'icon': '⚡'}, // Commented out
+      {'id': 'Jackpot', 'label': 'Jackpot', 'icon': '🃏'},
+    ];
+
+    return Obx(() {
+      return Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.45),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: modes.map((mode) {
+            bool isSelected =
+                controller.selectedSelectorMode.value == mode['id'];
+            return GestureDetector(
+              onTap: () => controller.setSelectorMode(mode['id']!),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFFFF007F).withValues(alpha: 0.8)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color:
+                                const Color(0xFFFF007F).withValues(alpha: 0.5),
+                            blurRadius: 10,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  children: [
+                    Text(mode['icon']!, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 5),
+                    Text(
+                      mode['label']!,
+                      style: GoogleFonts.orbitron(
+                        fontSize: 10.5,
+                        fontWeight:
+                            isSelected ? FontWeight.w900 : FontWeight.w600,
+                        color: isSelected ? Colors.white : Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    });
+  }
+
+  // Dynamic Central Selector (Jackpot Deck active; Spin & Radar commented out)
+  Widget _buildCentralSelector(double centerX, double centerY) {
+    return Obx(() {
+      String mode = controller.selectedSelectorMode.value;
+      int highlightedIdx = controller.highlightedPlayerIndex.value;
+      PlayerModel? activePlayer =
+          (highlightedIdx >= 0 && highlightedIdx < controller.players.length)
+              ? controller.players[highlightedIdx]
+              : null;
+
+      Widget childWidget;
+      double width;
+      double height;
+
+      switch (mode) {
+        /* Commented out spin and radar options:
+        case 'Wheel':
+          width = CyberWheelWidget.wheelRadius * 2;
+          height = CyberWheelWidget.wheelRadius * 2;
+          childWidget = CyberWheelWidget(...);
+          break;
+        case 'Radar':
+          width = 170;
+          height = 170;
+          childWidget = QuantumRadarWidget(...);
+          break;
+        case 'Bottle':
+        */
+        case 'Jackpot':
+        default:
+          width = 140;
+          height = 140;
+          childWidget = JackpotDeckWidget(
+            activePlayer: activePlayer,
+            isSpinning: controller.isSpinning.value,
+          );
+          break;
+      }
+
+      return Positioned(
+        left: centerX - (width / 2),
+        top: centerY - (height / 2),
+        child: GestureDetector(
+          onTap: controller.triggerSelection,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: controller.isSpinning.value
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF00FFFF).withValues(alpha: 0.4),
+                        blurRadius: 25,
+                        spreadRadius: 5,
+                      ),
+                    ]
+                  : [],
+            ),
+            child: childWidget,
+          ),
+        ),
+      );
+    });
+  }
+
   // Individual Radial Player Node Card
   Widget _buildPlayerNode({
     required PlayerModel player,
@@ -417,11 +548,13 @@ class GameView extends GetView<GameController> {
     required bool isLeader,
   }) {
     Color themeColor = player.color;
+    bool isHighlighted =
+        isWinner || controller.highlightedPlayerIndex.value == index;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutBack,
-      transform: isWinner
+      transform: isHighlighted
           ? (Matrix4.identity()..scale(1.22))
           : Matrix4.identity(),
       child: Column(
@@ -438,7 +571,7 @@ class GameView extends GetView<GameController> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: isWinner
+                    colors: isHighlighted
                         ? [themeColor, themeColor.withValues(alpha: 0.6)]
                         : [
                             Colors.black.withValues(alpha: 0.6),
@@ -448,16 +581,16 @@ class GameView extends GetView<GameController> {
                     end: Alignment.bottomRight,
                   ),
                   border: Border.all(
-                    color: isWinner ? Colors.white : themeColor,
-                    width: isWinner ? 2.5 : 1.5,
+                    color: isHighlighted ? Colors.white : themeColor,
+                    width: isHighlighted ? 2.5 : 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: isWinner
+                      color: isHighlighted
                           ? themeColor.withValues(alpha: 0.8)
                           : themeColor.withValues(alpha: 0.25),
-                      blurRadius: isWinner ? 16 : 8,
-                      spreadRadius: isWinner ? 3 : 0,
+                      blurRadius: isHighlighted ? 16 : 8,
+                      spreadRadius: isHighlighted ? 3 : 0,
                     ),
                   ],
                 ),
@@ -646,9 +779,9 @@ class GameView extends GetView<GameController> {
         boxShadow: [
           BoxShadow(
             color: glowColor.withValues(alpha: 0.4),
-            blurRadius: 16,
+            blurRadius: 14,
             spreadRadius: 1,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -658,7 +791,7 @@ class GameView extends GetView<GameController> {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(20),
           child: Ink(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: gradientColors,
@@ -675,7 +808,7 @@ class GameView extends GetView<GameController> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.25),
                     shape: BoxShape.circle,
@@ -683,10 +816,10 @@ class GameView extends GetView<GameController> {
                   child: Icon(
                     icon,
                     color: Colors.white,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 Flexible(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -698,9 +831,9 @@ class GameView extends GetView<GameController> {
                         child: Text(
                           title,
                           style: GoogleFonts.orbitron(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.1,
                             color: Colors.white,
                           ),
                         ),
@@ -710,7 +843,7 @@ class GameView extends GetView<GameController> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 9,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withValues(alpha: 0.85),
                         ),
