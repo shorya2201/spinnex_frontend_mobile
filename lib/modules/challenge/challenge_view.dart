@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
 import 'challenge_controller.dart';
 
 class ChallengeView extends GetView<ChallengeController> {
@@ -10,17 +11,14 @@ class ChallengeView extends GetView<ChallengeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.offWhiteBackground,
       extendBodyBehindAppBar: true,
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF0D0015), // Deep dark purple
-              Color(0xFF1B052A), // Cyberpunk plum
-              Color(0xFF080010), // Midnight black
-            ],
+            colors: AppTheme.offWhiteGradient,
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -45,7 +43,7 @@ class ChallengeView extends GetView<ChallengeController> {
 
                     const SizedBox(height: 20),
 
-                    // Central Challenge Card (Glassmorphic Container)
+                    // Central Challenge Card (Clean Light Surface Container)
                     Expanded(
                       child: _buildChallengeCard(),
                     ),
@@ -86,9 +84,9 @@ class ChallengeView extends GetView<ChallengeController> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: accentColor.withValues(alpha: 0.28),
+                  color: accentColor.withValues(alpha: 0.14),
                   blurRadius: 120,
-                  spreadRadius: 40,
+                  spreadRadius: 30,
                 ),
               ],
             ),
@@ -104,10 +102,10 @@ class ChallengeView extends GetView<ChallengeController> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: (controller.isDare ? const Color(0xFF00FFFF) : const Color(0xFFFF007F))
-                      .withValues(alpha: 0.20),
+                  color: (controller.isDare ? AppTheme.neonCyan : AppTheme.neonPink)
+                      .withValues(alpha: 0.12),
                   blurRadius: 110,
-                  spreadRadius: 30,
+                  spreadRadius: 25,
                 ),
               ],
             ),
@@ -122,28 +120,28 @@ class ChallengeView extends GetView<ChallengeController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Back Button in Frosted Glass Chip
+        // Back Button in Frosted Light Chip
         GestureDetector(
           onTap: () => Get.back(),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 18,
-                ),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppTheme.borderLight,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.textDarkSlate.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppTheme.textDarkSlate,
+              size: 18,
             ),
           ),
         ),
@@ -155,13 +153,7 @@ class ChallengeView extends GetView<ChallengeController> {
             fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 3,
-            color: const Color(0xFF00FFFF),
-            shadows: [
-              const Shadow(
-                color: Color(0xFF00FFFF),
-                blurRadius: 12,
-              ),
-            ],
+            color: AppTheme.textDarkSlate,
           ),
         ),
 
@@ -174,134 +166,129 @@ class ChallengeView extends GetView<ChallengeController> {
   /// Player Header Card with glowing ring avatar and challenge type tag
   Widget _buildPlayerHeaderCard() {
     final accent = controller.accentColor;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: accent.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withValues(alpha: 0.12),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.12),
+            blurRadius: 16,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
           ),
-          child: Row(
-            children: [
-              // Glowing Player Avatar Ring
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: controller.player.color.withValues(alpha: 0.25),
-                  border: Border.all(color: accent, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.5),
-                      blurRadius: 10,
+        ],
+      ),
+      child: Row(
+        children: [
+          // Glowing Player Avatar Ring
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: controller.player.color.withValues(alpha: 0.15),
+              border: Border.all(color: accent, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withValues(alpha: 0.35),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                controller.player.emoji,
+                style: const TextStyle(fontSize: 26),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          // Player Name & Current Score
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.player.name,
+                  style: GoogleFonts.orbitron(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textDarkSlate,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.military_tech_rounded,
+                      color: AppTheme.neonAmber,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Current Score: ${controller.player.score} pts",
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: AppTheme.textSubtleSlate,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(
-                    controller.player.emoji,
-                    style: const TextStyle(fontSize: 26),
+              ],
+            ),
+          ),
+
+          // Challenge Type Pill Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: accent, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withValues(alpha: 0.2),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  controller.typeIcon,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  controller.question.type.toUpperCase(),
+                  style: GoogleFonts.orbitron(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: accent,
+                    letterSpacing: 1.2,
                   ),
                 ),
-              ),
-
-              const SizedBox(width: 14),
-
-              // Player Name & Current Score
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      controller.player.name,
-                      style: GoogleFonts.orbitron(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.military_tech_rounded,
-                          color: Colors.amberAccent[200],
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "Current Score: ${controller.player.score} pts",
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Challenge Type Pill Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: accent, width: 1.2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      controller.typeIcon,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      controller.question.type.toUpperCase(),
-                      style: GoogleFonts.orbitron(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: accent,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  /// Central Frosted Glass Challenge Card
+  /// Central Clean Challenge Card
   Widget _buildChallengeCard() {
     final accent = controller.accentColor;
     return TweenAnimationBuilder<double>(
@@ -314,105 +301,96 @@ class ChallengeView extends GetView<ChallengeController> {
           child: child,
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.07),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.18),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.15),
-                  blurRadius: 30,
-                  spreadRadius: 2,
-                ),
-              ],
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: accent.withValues(alpha: 0.25),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.textDarkSlate.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            BoxShadow(
+              color: accent.withValues(alpha: 0.1),
+              blurRadius: 16,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Top Tag: Question Category
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Top Tag: Question Category
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        controller.question.category.toUpperCase(),
-                        style: GoogleFonts.orbitron(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white70,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    controller.question.category.toUpperCase(),
+                    style: GoogleFonts.orbitron(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSubtleSlate,
+                      letterSpacing: 1.5,
                     ),
-                    Icon(
-                      Icons.format_quote_rounded,
-                      color: accent.withValues(alpha: 0.6),
-                      size: 32,
-                    ),
-                  ],
-                ),
-
-                const Spacer(),
-
-                // Question Prompt Content Text
-                Text(
-                  controller.question.content,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    height: 1.45,
-                    shadows: [
-                      const Shadow(
-                        color: Colors.black54,
-                        blurRadius: 10,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
                   ),
                 ),
-
-                const Spacer(),
-
-                // Subtext / Challenge Prompt Footer
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.auto_awesome_rounded,
-                      color: accent,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Read aloud & complete before the timer expires!",
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.white60,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
+                Icon(
+                  Icons.format_quote_rounded,
+                  color: accent.withValues(alpha: 0.6),
+                  size: 32,
                 ),
               ],
             ),
-          ),
+
+            const Spacer(),
+
+            // Question Prompt Content Text
+            Text(
+              controller.question.content,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textDarkSlate,
+                height: 1.45,
+              ),
+            ),
+
+            const Spacer(),
+
+            // Subtext / Challenge Prompt Footer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.auto_awesome_rounded,
+                  color: accent,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  "Read aloud & complete before the timer expires!",
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: AppTheme.textSubtleSlate,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -429,7 +407,7 @@ class ChallengeView extends GetView<ChallengeController> {
       if (secondsLeft > 15) {
         timerColor = controller.accentColor;
       } else if (secondsLeft > 5) {
-        timerColor = const Color(0xFFFFB703); // Amber
+        timerColor = AppTheme.neonAmber;
       } else {
         timerColor = const Color(0xFFFF0055); // Neon Red Warning
       }
@@ -448,7 +426,7 @@ class ChallengeView extends GetView<ChallengeController> {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF0055).withValues(alpha: 0.2),
+                  color: const Color(0xFFFF0055).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFFF0055), width: 1),
                 ),
@@ -483,8 +461,8 @@ class ChallengeView extends GetView<ChallengeController> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: timerColor.withValues(alpha: isLow ? 0.6 : 0.25),
-                      blurRadius: isLow ? 24 : 16,
+                      color: timerColor.withValues(alpha: isLow ? 0.4 : 0.18),
+                      blurRadius: isLow ? 24 : 12,
                       spreadRadius: isLow ? 4 : 1,
                     ),
                   ],
@@ -498,7 +476,7 @@ class ChallengeView extends GetView<ChallengeController> {
                 child: CircularProgressIndicator(
                   value: secondsLeft / 45,
                   color: timerColor,
-                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                  backgroundColor: AppTheme.borderLight,
                   strokeWidth: 9,
                   strokeCap: StrokeCap.round,
                 ),
@@ -513,13 +491,7 @@ class ChallengeView extends GetView<ChallengeController> {
                     style: GoogleFonts.orbitron(
                       fontSize: 34,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          color: timerColor,
-                          blurRadius: 10,
-                        ),
-                      ],
+                      color: AppTheme.textDarkSlate,
                     ),
                   ),
                   Text(
@@ -527,7 +499,7 @@ class ChallengeView extends GetView<ChallengeController> {
                     style: GoogleFonts.orbitron(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white60,
+                      color: AppTheme.textSubtleSlate,
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -556,16 +528,16 @@ class ChallengeView extends GetView<ChallengeController> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF0055).withValues(alpha: 0.12),
+                  color: const Color(0xFFFFF1F2),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFFFF0055).withValues(alpha: 0.6),
+                    color: const Color(0xFFFF0055).withValues(alpha: 0.4),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF0055).withValues(alpha: 0.15),
-                      blurRadius: 12,
+                      color: const Color(0xFFFF0055).withValues(alpha: 0.1),
+                      blurRadius: 8,
                     ),
                   ],
                 ),
@@ -595,7 +567,7 @@ class ChallengeView extends GetView<ChallengeController> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF0055).withValues(alpha: 0.25),
+                        color: const Color(0xFFFF0055).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -629,16 +601,16 @@ class ChallengeView extends GetView<ChallengeController> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: controller.isDare
-                        ? [const Color(0xFFFF007F), const Color(0xFFFF5E00)]
-                        : [const Color(0xFF00FFFF), const Color(0xFF0088FF)],
+                        ? [AppTheme.neonPink, const Color(0xFFFF5E00)]
+                        : [AppTheme.neonCyan, const Color(0xFF0088FF)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: accent.withValues(alpha: 0.5),
-                      blurRadius: 20,
+                      color: accent.withValues(alpha: 0.35),
+                      blurRadius: 16,
                       spreadRadius: 1,
                       offset: const Offset(0, 4),
                     ),
@@ -670,7 +642,7 @@ class ChallengeView extends GetView<ChallengeController> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.25),
+                        color: Colors.black.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(

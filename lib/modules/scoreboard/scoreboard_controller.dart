@@ -24,12 +24,12 @@ class ScoreboardController extends GetxController {
 
   bool isBiggestChicken(int index) {
     if (players.length < 2) return false;
-    // The last person in the sorted list is the chicken
-    return index == players.length - 1;
+    // If all players have the same score (e.g., 0 scores at start), no chicken
+    if (players.first.score == players.last.score) return false;
+    return index == players.length - 1 && players[index].score < players.first.score;
   }
 
   void playAgain() {
-    // Navigate back to existing home route
-    Get.until((route) => route.settings.name == Routes.HOME || route.isFirst);
+    Get.offAllNamed(Routes.HOME);
   }
 }

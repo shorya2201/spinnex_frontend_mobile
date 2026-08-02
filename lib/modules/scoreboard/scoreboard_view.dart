@@ -1,21 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../theme/app_theme.dart';
 import 'scoreboard_controller.dart';
 
 class ScoreboardView extends GetView<ScoreboardController> {
-  const ScoreboardView({Key? key}) : super(key: key);
+  const ScoreboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.offWhiteBackground,
       appBar: AppBar(
-        title: const Text('FINAL SCORES'),
-        automaticallyImplyLeading:
-            false, // Prevent going back to a finished game
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceWhite,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppTheme.borderLight,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.textDarkSlate.withOpacity(0.05),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppTheme.textDarkSlate,
+              size: 18,
+            ),
+          ),
+          onPressed: () => Get.back(),
+        ),
+        title: const Text(
+          'FINAL SCORES',
+          style: TextStyle(
+            color: AppTheme.textDarkSlate,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Obx(
         () => controller.players.isEmpty
-            ? const Center(child: Text("No game data found."))
+            ? const Center(
+                child: Text(
+                  "No game data found.",
+                  style: TextStyle(color: AppTheme.textSubtleSlate),
+                ),
+              )
             : ListView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -31,37 +67,51 @@ class ScoreboardView extends GetView<ScoreboardController> {
                     duration: Duration(milliseconds: 400 + (index * 100)),
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
+                      color: AppTheme.surfaceWhite,
                       borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: mvp
+                              ? AppTheme.neonCyan.withOpacity(0.2)
+                              : AppTheme.textDarkSlate.withOpacity(0.04),
+                          blurRadius: mvp ? 12 : 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                       gradient: LinearGradient(
                         colors: mvp
                             ? [
-                                const Color(0xFF00FFFF).withOpacity(0.3),
-                                Colors.transparent,
+                                AppTheme.neonCyan.withOpacity(0.12),
+                                AppTheme.surfaceWhite,
                               ]
                             : [
-                                Colors.white.withOpacity(0.05),
-                                Colors.transparent,
+                                AppTheme.surfaceWhite,
+                                const Color(0xFFF1F5F9),
                               ],
                       ),
                       border: Border.all(
-                        color: mvp ? const Color(0xFF00FFFF) : Colors.white10,
+                        color: mvp ? AppTheme.neonCyan : AppTheme.borderLight,
                         width: mvp ? 2 : 1,
                       ),
                     ),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: mvp
-                            ? const Color(0xFF00FFFF)
-                            : Colors.grey[900],
+                            ? AppTheme.neonCyan
+                            : const Color(0xFFE2E8F0),
                         child: Text(
                           "${index + 1}",
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(
+                            color: mvp ? Colors.white : AppTheme.textDarkSlate,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       title: Text(
                         player.name,
                         style: TextStyle(
-                          fontWeight: mvp ? FontWeight.bold : FontWeight.normal,
+                          color: AppTheme.textDarkSlate,
+                          fontWeight: mvp ? FontWeight.bold : FontWeight.w600,
                           fontSize: 18,
                         ),
                       ),
@@ -69,24 +119,26 @@ class ScoreboardView extends GetView<ScoreboardController> {
                           ? const Text(
                               "👑 PARTY MVP",
                               style: TextStyle(
-                                color: Color(0xFF00FFFF),
+                                color: AppTheme.neonCyan,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
                             )
                           : chicken
-                          ? const Text(
-                              "🐔 CHICKENED OUT",
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                              ),
-                            )
-                          : null,
+                              ? const Text(
+                                  "🐔 CHICKENED OUT",
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                )
+                              : null,
                       trailing: Text(
                         "${player.score} pts",
                         style: TextStyle(
                           color: player.score >= 0
-                              ? const Color(0xFF39FF14)
+                              ? AppTheme.neonGreen
                               : Colors.redAccent,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
@@ -97,7 +149,8 @@ class ScoreboardView extends GetView<ScoreboardController> {
                 },
               ),
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
+        color: AppTheme.offWhiteBackground,
         padding: const EdgeInsets.all(24.0),
         child: ElevatedButton(
           onPressed: controller.playAgain,

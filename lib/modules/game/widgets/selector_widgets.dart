@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/player_model.dart';
+import '../../../theme/app_theme.dart';
 
 /// Cyber Wheel Widget: A glowing roulette wheel split into player slices
 class CyberWheelWidget extends StatelessWidget {
@@ -29,23 +30,9 @@ class CyberWheelWidget extends StatelessWidget {
           // Rotating Wheel Canvas
           Transform.rotate(
             angle: currentAngle,
-            child: Container(
-              width: wheelRadius * 2,
-              height: wheelRadius * 2,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF00FFFF).withValues(alpha: isSpinning ? 0.45 : 0.20),
-                    blurRadius: isSpinning ? 30 : 15,
-                    spreadRadius: isSpinning ? 6 : 2,
-                  ),
-                ],
-              ),
-              child: CustomPaint(
-                painter: _CyberWheelPainter(players: players),
-                size: Size(wheelRadius * 2, wheelRadius * 2),
-              ),
+            child: CustomPaint(
+              painter: _CyberWheelPainter(players: players),
+              size: const Size(wheelRadius * 2, wheelRadius * 2),
             ),
           ),
 
@@ -55,16 +42,14 @@ class CyberWheelWidget extends StatelessWidget {
             height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const RadialGradient(
-                colors: [Color(0xFF2A004E), Color(0xFF0D0015)],
-              ),
+              color: AppTheme.surfaceWhite,
               border: Border.all(
-                color: const Color(0xFF00FFFF),
+                color: AppTheme.neonPink,
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF007F).withValues(alpha: 0.4),
+                  color: AppTheme.neonPink.withValues(alpha: 0.35),
                   blurRadius: 10,
                 ),
               ],
@@ -72,7 +57,7 @@ class CyberWheelWidget extends StatelessWidget {
             child: Center(
               child: Icon(
                 isSpinning ? Icons.sync_rounded : Icons.play_arrow_rounded,
-                color: Colors.white,
+                color: AppTheme.neonPink,
                 size: 28,
               ),
             ),
@@ -122,11 +107,11 @@ class _CyberWheelPainter extends CustomPainter {
           center: Alignment.center,
           radius: 1.0,
           colors: [
-            color.withValues(alpha: 0.9),
-            color.withValues(alpha: 0.5),
-            const Color(0xFF0D0015),
+            color.withValues(alpha: 0.95),
+            color.withValues(alpha: 0.65),
+            AppTheme.surfaceWhite,
           ],
-          stops: const [0.2, 0.7, 1.0],
+          stops: const [0.2, 0.75, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: radius));
 
       canvas.drawArc(
@@ -138,43 +123,69 @@ class _CyberWheelPainter extends CustomPainter {
       );
 
       // Slice Border Divider
-      final borderPaint = Paint()
-        ..color = Colors.white.withValues(alpha: 0.3)
+      final dividerPaint = Paint()
+        ..color = AppTheme.surfaceWhite
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
+        ..strokeWidth = 2.0;
 
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - 4),
-        startAngle,
-        sweepAngle,
-        true,
-        borderPaint,
-      );
+      final endX = center.dx + (radius - 4) * cos(startAngle);
+      final endY = center.dy + (radius - 4) * sin(startAngle);
+      canvas.drawLine(center, Offset(endX, endY), dividerPaint);
 
-      // Draw Player Emoji Icon on Slice
-      final labelAngle = startAngle + (sweepAngle / 2);
-      final iconRadius = radius * 0.65;
-      final iconX = center.dx + iconRadius * cos(labelAngle);
-      final iconY = center.dy + iconRadius * sin(labelAngle);
-
-      TextPainter tp = TextPainter(
-        text: TextSpan(
-          text: player.emoji,
-          style: const TextStyle(fontSize: 16),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      tp.paint(canvas, Offset(iconX - tp.width / 2, iconY - tp.height / 2));
+      // Draw Player Emoji & Name
+      _drawSliceContent(canvas, center, radius, startAngle, sweepAngle, player);
     }
 
-    // Outer Neon Ring
-    final outerRingPaint = Paint()
-      ..color = const Color(0xFF00FFFF).withValues(alpha: 0.8)
+    // Outer Rim Glow Ring
+    final rimPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..color = AppTheme.neonPink
+      ..strokeWidth = 4.0;
+    canvas.drawCircle(center, radius - 2, rimPaint);
+  }
 
-    canvas.drawCircle(center, radius - 4, outerRingPaint);
+  void _drawSliceContent(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double startAngle,
+    double sweepAngle,
+    PlayerModel player,
+  ) {
+    final midAngle = startAngle + (sweepAngle / 2);
+    final textRadius = radius * 0.62;
+
+    final labelX = center.dx + textRadius * cos(midAngle);
+    final labelY = center.dy + textRadius * sin(midAngle);
+
+    canvas.save();
+    canvas.translate(labelX, labelY);
+    canvas.rotate(midAngle + (pi / 2));
+
+    final textSpan = TextSpan(
+      text: "${player.emoji} ${player.name}",
+      style: GoogleFonts.orbitron(
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: const [
+          Shadow(color: Colors.black87, blurRadius: 4),
+        ],
+      ),
+    );
+
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(-textPainter.width / 2, -textPainter.height / 2),
+    );
+
+    canvas.restore();
   }
 
   @override
@@ -191,160 +202,190 @@ class _PointerArrowPainter extends CustomPainter {
       ..lineTo(size.width, 0)
       ..close();
 
-    final paint = Paint()
+    final fillPaint = Paint()
+      ..style = PaintingStyle.fill
       ..shader = const LinearGradient(
+        colors: [AppTheme.neonPink, Color(0xFFFF4500)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Color(0xFFFF007F), Color(0xFFFF4500)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    canvas.drawPath(path, paint);
-
-    final strokePaint = Paint()
-      ..color = Colors.white
+    final borderPaint = Paint()
       ..style = PaintingStyle.stroke
+      ..color = AppTheme.surfaceWhite
       ..strokeWidth = 1.5;
 
-    canvas.drawPath(path, strokePaint);
+    canvas.drawPath(path, fillPaint);
+    canvas.drawPath(path, borderPaint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Quantum Radar Pulse Widget: Concentric radar dish target scanner
-class QuantumRadarWidget extends StatelessWidget {
-  final PlayerModel? activePlayer;
-  final bool isSpinning;
+/// Cyber Radar Selector Widget (Scanning Beam)
+class CyberRadarWidget extends StatelessWidget {
+  final List<PlayerModel> players;
   final double currentAngle;
+  final bool isSpinning;
+  final int? selectedIndex;
 
-  const QuantumRadarWidget({
+  const CyberRadarWidget({
     super.key,
-    required this.activePlayer,
-    required this.isSpinning,
+    required this.players,
     required this.currentAngle,
+    required this.isSpinning,
+    this.selectedIndex,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 170,
-      height: 170,
+      width: 220,
+      height: 220,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Rotating Radar Beam Sweep
-          Transform.rotate(
-            angle: currentAngle,
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFF39FF14).withValues(alpha: 0.4),
-                  width: 1.5,
-                ),
-              ),
-              child: CustomPaint(
-                painter: _RadarBeamPainter(),
-              ),
+          // Radar Scope Background Rings & Sweep
+          CustomPaint(
+            painter: _RadarScopePainter(
+              currentAngle: currentAngle,
+              isSpinning: isSpinning,
             ),
+            size: const Size(220, 220),
           ),
 
-          // Central Holographic Energy Core
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: activePlayer != null
-                  ? activePlayer!.color.withValues(alpha: 0.25)
-                  : const Color(0xFF39FF14).withValues(alpha: 0.15),
-              border: Border.all(
-                color: activePlayer != null
-                    ? activePlayer!.color
-                    : const Color(0xFF39FF14),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: activePlayer != null
-                      ? activePlayer!.color.withValues(alpha: 0.6)
-                      : const Color(0xFF39FF14).withValues(alpha: 0.4),
-                  blurRadius: isSpinning ? 20 : 10,
-                  spreadRadius: isSpinning ? 4 : 1,
-                ),
-              ],
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    activePlayer?.emoji ?? "⚡",
-                    style: TextStyle(fontSize: activePlayer != null ? 26 : 22),
-                  ),
-                  if (activePlayer != null)
-                    Text(
-                      activePlayer!.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.orbitron(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+          // Player Nodes Positioned Orbitally
+          for (int i = 0; i < players.length; i++)
+            _buildPlayerNode(context, i, players.length),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerNode(BuildContext context, int index, int total) {
+    final angle = (2 * pi / total) * index - (pi / 2);
+    final distance = 80.0;
+    final x = distance * cos(angle);
+    final y = distance * sin(angle);
+
+    final isHighlighted = selectedIndex == index;
+    final player = players[index];
+
+    return Transform.translate(
+      offset: Offset(x, y),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: isHighlighted ? 44 : 36,
+        height: isHighlighted ? 44 : 36,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isHighlighted
+              ? AppTheme.neonGreen
+              : AppTheme.surfaceWhite,
+          border: Border.all(
+            color: isHighlighted
+                ? AppTheme.neonGreen
+                : AppTheme.borderLight,
+            width: isHighlighted ? 2.5 : 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isHighlighted
+                  ? AppTheme.neonGreen.withValues(alpha: 0.5)
+                  : AppTheme.textDarkSlate.withValues(alpha: 0.08),
+              blurRadius: isHighlighted ? 12 : 4,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            player.emoji,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _RadarBeamPainter extends CustomPainter {
+class _RadarScopePainter extends CustomPainter {
+  final double currentAngle;
+  final bool isSpinning;
+
+  _RadarScopePainter({
+    required this.currentAngle,
+    required this.isSpinning,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    final sweepPaint = Paint()
-      ..shader = SweepGradient(
-        colors: [
-          Colors.transparent,
-          const Color(0xFF39FF14).withValues(alpha: 0.05),
-          const Color(0xFF39FF14).withValues(alpha: 0.4),
-          const Color(0xFF39FF14),
-        ],
-        stops: const [0.0, 0.7, 0.95, 1.0],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
+    // Grid Concentric Rings
+    final ringPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = AppTheme.borderLight
+      ..strokeWidth = 1.0;
 
-    canvas.drawCircle(center, radius, sweepPaint);
+    canvas.drawCircle(center, radius - 10, ringPaint);
+    canvas.drawCircle(center, radius - 45, ringPaint);
+    canvas.drawCircle(center, radius - 80, ringPaint);
 
     // Crosshairs
-    final linePaint = Paint()
-      ..color = const Color(0xFF39FF14).withValues(alpha: 0.25)
-      ..strokeWidth = 1;
+    canvas.drawLine(
+      Offset(10, center.dy),
+      Offset(size.width - 10, center.dy),
+      ringPaint,
+    );
+    canvas.drawLine(
+      Offset(center.dx, 10),
+      Offset(center.dx, size.height - 10),
+      ringPaint,
+    );
 
-    canvas.drawLine(Offset(0, center.dy), Offset(size.width, center.dy), linePaint);
-    canvas.drawLine(Offset(center.dx, 0), Offset(center.dx, size.height), linePaint);
+    // Sweep Beam Sector
+    final sweepPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..shader = SweepGradient(
+        center: Alignment.center,
+        startAngle: 0.0,
+        endAngle: pi / 2,
+        colors: [
+          Colors.transparent,
+          AppTheme.neonGreen.withValues(alpha: 0.05),
+          AppTheme.neonGreen.withValues(alpha: 0.2),
+          AppTheme.neonGreen.withValues(alpha: 0.4),
+        ],
+        transform: GradientRotation(currentAngle),
+      ).createShader(Rect.fromCircle(center: center, radius: radius - 10));
+
+    canvas.drawCircle(center, radius - 10, sweepPaint);
+
+    // Leading Radar Beam Line
+    final beamAngle = currentAngle + (pi / 2);
+    final beamEnd = Offset(
+      center.dx + (radius - 10) * cos(beamAngle),
+      center.dy + (radius - 10) * sin(beamAngle),
+    );
+    final beamLinePaint = Paint()
+      ..color = AppTheme.neonGreen
+      ..strokeWidth = 2.0;
+
+    canvas.drawLine(center, beamEnd, beamLinePaint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _RadarScopePainter oldDelegate) => true;
 }
 
-/// Holographic Jackpot Deck Widget: High-tech slot-card shuffle animation core
-class JackpotDeckWidget extends StatelessWidget {
+/// Cyber Jackpot Draw Box Widget
+class CyberJackpotWidget extends StatelessWidget {
   final PlayerModel? activePlayer;
   final bool isSpinning;
 
-  const JackpotDeckWidget({
+  const CyberJackpotWidget({
     super.key,
     required this.activePlayer,
     required this.isSpinning,
@@ -354,19 +395,11 @@ class JackpotDeckWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: 110,
-      height: 110,
+      width: 120,
+      height: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFFBF5FFF).withValues(alpha: 0.3),
-            const Color(0xFF0D0015),
-            const Color(0xFFFF007F).withValues(alpha: 0.2),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.surfaceWhite,
         border: Border.all(
           color: activePlayer != null
               ? activePlayer!.color
@@ -376,10 +409,10 @@ class JackpotDeckWidget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: activePlayer != null
-                ? activePlayer!.color.withValues(alpha: 0.6)
-                : const Color(0xFFBF5FFF).withValues(alpha: 0.35),
+                ? activePlayer!.color.withValues(alpha: 0.4)
+                : AppTheme.textDarkSlate.withValues(alpha: 0.08),
             blurRadius: isSpinning ? 20 : 10,
-            spreadRadius: isSpinning ? 4 : 1,
+            spreadRadius: isSpinning ? 3 : 1,
           ),
         ],
       ),
@@ -390,21 +423,25 @@ class JackpotDeckWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 100),
                 transitionBuilder: (child, animation) {
-                  return ScaleTransition(scale: animation, child: child);
+                  return FadeTransition(opacity: animation, child: child);
                 },
                 child: KeyedSubtree(
                   key: ValueKey(activePlayer?.name ?? "SHUFFLE"),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         activePlayer?.emoji ?? "🃏",
-                        style: const TextStyle(fontSize: 26),
+                        style: const TextStyle(
+                          fontSize: 34,
+                          height: 1.1,
+                        ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 6),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
                         child: Text(
                           activePlayer != null
                               ? activePlayer!.name.toUpperCase()
@@ -412,9 +449,9 @@ class JackpotDeckWidget extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.orbitron(
-                            fontSize: 9.5,
+                            fontSize: 10,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: AppTheme.textDarkSlate,
                             letterSpacing: 0.8,
                           ),
                         ),

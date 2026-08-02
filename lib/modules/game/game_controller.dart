@@ -15,6 +15,10 @@ class GameController extends GetxController
   var selectedSelectorMode = 'Jackpot'.obs; // Active mode: 'Jackpot' (Options commented out: 'Bottle', 'Wheel', 'Radar')
 
   var currentAngle = 0.0.obs;
+  RxDouble get rotationAngle => currentAngle;
+  void spin() => triggerSelection();
+  void finishGame() => endGame();
+
   var selectedPlayerIndex = (-1).obs;
   var highlightedPlayerIndex = (-1).obs;
   var showActionButtons = false.obs;
@@ -93,6 +97,8 @@ class GameController extends GetxController
     return nextIndex;
   }
 
+  VoidCallback? _lastAnimationListener;
+
   void triggerSelection() {
     if (isSpinning.value) return;
     if (players.isEmpty) return;
@@ -103,11 +109,16 @@ class GameController extends GetxController
     highlightedPlayerIndex.value = -1;
 
     final random = Random();
-    _runJackpotSelection(random);
+    int targetIndex = _drawNextPlayerIndex(random);
+
+    if (selectedSelectorMode.value == 'Jackpot') {
+      _runJackpotSelection(random, targetIndex);
+    } else {
+      _runRotationalSelection(random, targetIndex);
+    }
   }
 
-  void _runJackpotSelection(Random random) async {
-    int targetIndex = _drawNextPlayerIndex(random);
+  void _runJackpotSelection(Random random, int targetIndex) async {
     int totalSteps = 25 + random.nextInt(10);
     int currentStep = 0;
 
@@ -125,6 +136,54 @@ class GameController extends GetxController
     }
 
     _onSpinComplete(precalculatedIndex: targetIndex);
+  }
+
+  void _runRotationalSelection(Random random, int targetIndex) {
+    double slice = (2 * pi) / players.length;
+    double targetAngleForIndex = targetIndex * slice - (pi / 2);
+
+    double currentModulo = currentAngle.value % (2 * pi);
+    double angleDistance = targetAngleForIndex - currentModulo;
+    if (angleDistance <= 0) {
+      angleDistance += 2 * pi;
+    }
+
+    double fullSpins = (5 + random.nextInt(4)) * 2 * pi;
+    double endAngle = currentAngle.value + fullSpins + angleDistance;
+
+    if (_lastAnimationListener != null) {
+      _animationController.removeListener(_lastAnimationListener!);
+    }
+
+    _animation = Tween<double>(
+      begin: currentAngle.value,
+      end: endAngle,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.decelerate,
+      ),
+    );
+
+    _animationController.duration = Duration(milliseconds: 3200 + random.nextInt(800));
+
+    void listener() {
+      if (_animationController.isAnimating) {
+        currentAngle.value = _animation.value;
+
+        double normalized = (currentAngle.value + (slice / 2)) % (2 * pi);
+        if (normalized < 0) normalized += 2 * pi;
+        int stepIndex = (normalized / slice).floor() % players.length;
+        highlightedPlayerIndex.value = stepIndex;
+      }
+    }
+
+    _lastAnimationListener = listener;
+    _animationController.addListener(listener);
+
+    _animationController.forward(from: 0.0).then((_) {
+      _onSpinComplete(precalculatedIndex: targetIndex);
+    });
   }
 
   void spinBottle() {
@@ -198,7 +257,7 @@ class GameController extends GetxController
   }
 
   void endGame() {
-    Get.offAllNamed(Routes.SCOREBOARD, arguments: players.toList());
+    Get.toNamed(Routes.SCOREBOARD, arguments: players.toList());
   }
 
   @override

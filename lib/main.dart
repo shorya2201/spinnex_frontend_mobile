@@ -20,7 +20,7 @@ class NeonSpinApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // Theme Configuration
-      theme: AppTheme.neonTheme,
+      theme: AppTheme.offWhiteNeonTheme,
 
       // Routing Configuration
       initialRoute: AppPages.INITIAL,
