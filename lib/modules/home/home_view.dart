@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
@@ -104,17 +105,15 @@ class HomeView extends GetView<HomeController> {
                             _buildHeader(context),
                             const SizedBox(height: 20),
 
-                            // Category / Deck Selection
-                            _buildSectionHeader(
-                              title: "SELECT CATEGORY",
-                              icon: Icons.style_rounded,
-                            ),
-                            const SizedBox(height: 10),
-                            _buildCategorySelector(),
-                            const SizedBox(height: 24),
+                            // Mode Switcher Toggle
+                            _buildModeSwitcher(),
+                            const SizedBox(height: 20),
 
-                            // Player Lobby Section
-                            _buildLobbySection(context),
+                            // Mode-specific content
+                            Obx(() => controller.isOnlineMode.value
+                                ? _buildOnlineArenaSection(context)
+                                : _buildOfflineSection(context)),
+
                             const SizedBox(height: 24),
 
                             // Settings & Utilities
@@ -814,7 +813,7 @@ class HomeView extends GetView<HomeController> {
       },
     };
 
-    return Row(
+    return Obx(() => Row(
       children: controller.categories.map((cat) {
         bool isSelected = controller.selectedCategory.value == cat;
         var details = categoryDetails[cat] ??
@@ -947,7 +946,7 @@ class HomeView extends GetView<HomeController> {
           ),
         );
       }).toList(),
-    );
+    ));
   }
 
   // Settings Glass Card
@@ -1054,56 +1053,103 @@ class HomeView extends GetView<HomeController> {
       ),
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          height: 52,
-          child: ElevatedButton(
-            onPressed: controller.startGame,
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(26),
+        child: Obx(() {
+          final bool isGuestInActiveRoom = controller.isOnlineMode.value &&
+              controller.roomCode.value.isNotEmpty &&
+              !controller.isHost.value;
+
+          if (!isGuestInActiveRoom) {
+            return SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: controller.startGame,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  elevation: 6,
+                  shadowColor: AppTheme.neonPink.withOpacity(0.4),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppTheme.neonPink,
+                        AppTheme.neonCyan,
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "START GAME",
+                          style: GoogleFonts.orbitron(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.rocket_launch_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              elevation: 6,
-              shadowColor: AppTheme.neonPink.withOpacity(0.4),
-            ),
-            child: Ink(
+            );
+          } else {
+            return Container(
+              height: 52,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    AppTheme.neonPink,
-                    AppTheme.neonCyan,
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+                color: AppTheme.neonAmber.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(26),
-              ),
-              child: Container(
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "START GAME",
-                      style: GoogleFonts.orbitron(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.rocket_launch_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ],
+                border: Border.all(
+                  color: AppTheme.neonAmber.withOpacity(0.8),
+                  width: 1.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.neonAmber.withOpacity(0.15),
+                    blurRadius: 10,
+                  ),
+                ],
               ),
-            ),
-          ),
-        ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.hourglass_top_rounded,
+                    color: AppTheme.neonAmber,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "WAITING FOR HOST TO START",
+                    style: GoogleFonts.orbitron(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5,
+                      color: AppTheme.neonAmber,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        }),
       ),
     );
   }
@@ -1320,6 +1366,514 @@ class HomeView extends GetView<HomeController> {
           initialColor: initialColor,
         );
       },
+    );
+  }
+
+  // ───────────────────────────────────────────────────────────────────────
+  // Mode Switcher – "Pass & Play" vs "Online Arena"
+  // ───────────────────────────────────────────────────────────────────────
+
+  Widget _buildModeSwitcher() {
+    return Obx(() {
+      final online = controller.isOnlineMode.value;
+      return Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.borderLight),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.textDarkSlate.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Expanded(child: _modePill('Pass & Play', Icons.groups_rounded, !online, () {
+              if (online) controller.leaveOnlineRoom();
+            })),
+            Expanded(child: _modePill('Online Arena', Icons.wifi_rounded, online, () {
+              if (!online) controller.isOnlineMode.value = true;
+            })),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _modePill(String label, IconData icon, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        decoration: BoxDecoration(
+          gradient: active
+              ? const LinearGradient(
+                  colors: [AppTheme.neonPink, AppTheme.neonCyan],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: active
+              ? [BoxShadow(color: AppTheme.neonPink.withOpacity(0.3), blurRadius: 10)]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: active ? Colors.white : AppTheme.textSubtleSlate),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: GoogleFonts.orbitron(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+                color: active ? Colors.white : AppTheme.textSubtleSlate,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOfflineSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader(title: 'SELECT CATEGORY', icon: Icons.style_rounded),
+        const SizedBox(height: 10),
+        _buildCategorySelector(),
+        const SizedBox(height: 24),
+        _buildLobbySection(context),
+      ],
+    );
+  }
+
+  Widget _buildOnlineArenaSection(BuildContext context) {
+    return Obx(() {
+      final hasRoom = controller.roomCode.value.isNotEmpty;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasRoom) ...[
+            _buildActiveRoomBanner(),
+            const SizedBox(height: 20),
+          ],
+          if (!hasRoom) ...[
+            _buildSectionHeader(title: 'ONLINE ARENA', icon: Icons.wifi_rounded),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildOnlineActionCard(
+                    icon: Icons.add_circle_outline_rounded,
+                    title: 'Create Room',
+                    subtitle: 'Host a new game',
+                    color: AppTheme.neonGreen,
+                    onTap: () => _showCreateRoomSheet(context),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildOnlineActionCard(
+                    icon: Icons.login_rounded,
+                    title: 'Join Arena',
+                    subtitle: 'Enter room code',
+                    color: AppTheme.neonCyan,
+                    onTap: () => _showJoinRoomSheet(context),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppTheme.neonCyan.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.neonCyan.withOpacity(0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline_rounded, color: AppTheme.neonCyan, size: 18),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Create a room and share the code. Friends join in real-time!',
+                      style: TextStyle(fontSize: 12, color: AppTheme.textSubtleSlate, height: 1.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      );
+    });
+  }
+
+  Widget _buildOnlineActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withOpacity(0.12), blurRadius: 14, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                shape: BoxShape.circle,
+                border: Border.all(color: color.withOpacity(0.4)),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 10),
+            Text(title,
+                style: GoogleFonts.orbitron(fontSize: 12, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+            const SizedBox(height: 4),
+            Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.textSubtleSlate)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveRoomBanner() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: AppTheme.neonGreen.withOpacity(0.1), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.neonGreen.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+                ),
+                child: const Icon(Icons.wifi_rounded, color: AppTheme.neonGreen, size: 14),
+              ),
+              const SizedBox(width: 8),
+              Obx(() => Text(
+                controller.isHost.value ? 'YOUR ROOM' : 'JOINED ROOM',
+                style: GoogleFonts.orbitron(fontSize: 12, fontWeight: FontWeight.w900, color: AppTheme.neonGreen, letterSpacing: 1.2),
+              )),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => Get.defaultDialog(
+                  title: 'Leave Room?',
+                  middleText: 'Are you sure you want to leave?',
+                  onConfirm: controller.leaveOnlineRoom,
+                  onCancel: () => Get.back(),
+                  textConfirm: 'Leave',
+                  textCancel: 'Stay',
+                  confirmTextColor: Colors.white,
+                  buttonColor: AppTheme.neonPink,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppTheme.neonPink.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.neonPink.withOpacity(0.5)),
+                  ),
+                  child: const Text('Leave', style: TextStyle(color: AppTheme.neonPink, fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Obx(() => Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.neonGreen.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppTheme.neonGreen.withOpacity(0.4)),
+                  ),
+                  child: Center(
+                    child: Text(
+                      controller.roomCode.value,
+                      style: GoogleFonts.orbitron(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 4, color: AppTheme.textDarkSlate),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: controller.roomCode.value));
+                  Get.snackbar('Copied!', 'Room code copied.', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 2));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceWhite,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppTheme.borderLight),
+                  ),
+                  child: const Icon(Icons.copy_rounded, size: 18, color: AppTheme.textSubtleSlate),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: controller.shareRoomCode,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [AppTheme.neonPink, AppTheme.neonCyan]),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.share_rounded, size: 18, color: Colors.white),
+                ),
+              ),
+            ],
+          )),
+          const SizedBox(height: 14),
+          Obx(() {
+            final players = controller.onlinePlayers;
+            if (players.isEmpty) return const SizedBox.shrink();
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: players.map((p) {
+                final isPending = p.status == 'PENDING';
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: p.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: isPending ? AppTheme.neonAmber : p.color),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(p.emoji, style: const TextStyle(fontSize: 13)),
+                      const SizedBox(width: 5),
+                      Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDarkSlate)),
+                      if (p.host) ...[const SizedBox(width: 4), const Icon(Icons.star_rounded, size: 12, color: AppTheme.neonAmber)],
+                      if (isPending) ...[const SizedBox(width: 4), const Icon(Icons.hourglass_top_rounded, size: 12, color: AppTheme.neonAmber)],
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateRoomSheet(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    Get.bottomSheet(
+      StatefulBuilder(builder: (ctx, setS) {
+        return SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 24, right: 24, top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            decoration: const BoxDecoration(
+              color: AppTheme.offWhiteBackground,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 40, height: 4,
+                    decoration: BoxDecoration(color: AppTheme.borderLight, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 20),
+                Text('Create Cyber Room 🎮',
+                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+                const SizedBox(height: 6),
+                const Text('Set up a room and invite your squad', style: TextStyle(color: AppTheme.textSubtleSlate, fontSize: 13)),
+                const SizedBox(height: 20),
+                _buildSectionHeader(title: 'CATEGORY', icon: Icons.style_rounded),
+                const SizedBox(height: 10),
+                _buildCategorySelector(),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Your Name (Host)',
+                    hintText: 'Enter your display name',
+                    prefixIcon: const Icon(Icons.person_rounded),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppTheme.neonGreen, width: 2)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Obx(() => SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: controller.isOnlineLoading.value
+                        ? null
+                        : () {
+                            final name = nameCtrl.text.trim();
+                            if (name.isEmpty) {
+                              Get.snackbar('Name Required', 'Please enter your name.', snackPosition: SnackPosition.BOTTOM);
+                              return;
+                            }
+                            Get.back();
+                            controller.createOnlineRoom(name);
+                          },
+                    icon: controller.isOnlineLoading.value
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.add_circle_rounded),
+                    label: Text(controller.isOnlineLoading.value ? 'Creating...' : 'Create Room',
+                        style: GoogleFonts.orbitron(fontWeight: FontWeight.w800)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.neonGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      elevation: 4,
+                      shadowColor: AppTheme.neonGreen.withOpacity(0.4),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        );
+      }),
+      isScrollControlled: true,
+    );
+  }
+
+  void _showJoinRoomSheet(BuildContext context) {
+    final codeCtrl = TextEditingController();
+    final nameCtrl = TextEditingController();
+    Get.bottomSheet(
+      StatefulBuilder(builder: (ctx, setS) {
+        return SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 24, right: 24, top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            decoration: const BoxDecoration(
+              color: AppTheme.offWhiteBackground,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 40, height: 4,
+                    decoration: BoxDecoration(color: AppTheme.borderLight, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 20),
+                Text('Join Arena 🎯',
+                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+                const SizedBox(height: 6),
+                const Text('Enter the room code shared by your host', style: TextStyle(color: AppTheme.textSubtleSlate, fontSize: 13)),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: codeCtrl,
+                  textCapitalization: TextCapitalization.characters,
+                  maxLength: 10,
+                  decoration: InputDecoration(
+                    labelText: 'Room Code',
+                    hintText: 'e.g. SPIN88',
+                    prefixIcon: const Icon(Icons.tag_rounded),
+                    counterText: '',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppTheme.neonCyan, width: 2)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Your Name',
+                    hintText: 'Enter your display name',
+                    prefixIcon: const Icon(Icons.person_rounded),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppTheme.neonCyan, width: 2)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Obx(() => SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: controller.isOnlineLoading.value
+                        ? null
+                        : () {
+                            final code = codeCtrl.text.trim();
+                            final name = nameCtrl.text.trim();
+                            if (code.isEmpty || name.isEmpty) {
+                              Get.snackbar('Required', 'Please fill in both fields.', snackPosition: SnackPosition.BOTTOM);
+                              return;
+                            }
+                            Get.back();
+                            controller.joinOnlineRoom(name, code);
+                          },
+                    icon: controller.isOnlineLoading.value
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.login_rounded),
+                    label: Text(controller.isOnlineLoading.value ? 'Joining...' : 'Join Room',
+                        style: GoogleFonts.orbitron(fontWeight: FontWeight.w800)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.neonCyan,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      elevation: 4,
+                      shadowColor: AppTheme.neonCyan.withOpacity(0.4),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        );
+      }),
+      isScrollControlled: true,
     );
   }
 }

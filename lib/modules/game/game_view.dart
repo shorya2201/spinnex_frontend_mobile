@@ -9,6 +9,7 @@ import '../../theme/app_theme.dart';
 import 'game_controller.dart';
 import 'widgets/mode_spinner.dart';
 import 'widgets/selector_widgets.dart';
+import 'widgets/guest_waiting_overlay.dart';
 
 class GameView extends GetView<GameController> {
   const GameView({super.key});
@@ -25,23 +26,25 @@ class GameView extends GetView<GameController> {
         backgroundColor: AppTheme.offWhiteBackground,
         extendBodyBehindAppBar: true,
         appBar: _buildAppBar(context),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: AppTheme.offWhiteGradient,
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: -30,
-                  left: -30,
-                  child: Container(
-                    width: 220,
-                    height: 220,
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: AppTheme.offWhiteGradient,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: SafeArea(
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -30,
+                      left: -30,
+                      child: Container(
+                        width: 220,
+                        height: 220,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -163,9 +166,23 @@ class GameView extends GetView<GameController> {
             ),
           ),
         ),
-      ),
-    );
-  }
+        // Guest Waiting Overlay – shown on top when pending approval
+        Obx(() {
+          if (!controller.isPendingApproval.value) return const SizedBox.shrink();
+          return GuestWaitingOverlay(
+            hostName: 'Host',
+            roomCode: controller.roomCode,
+            onCancel: () {
+              controller.isPendingApproval.value = false;
+              Get.back();
+            },
+          );
+        }),
+      ],
+    ),
+  ),
+);
+}
 
   // Central Dynamic Selector Widget
   Widget _buildCentralSelectorWidget(BuildContext context) {

@@ -15,18 +15,18 @@ class QuestionProvider extends GetConnect {
 
     // Request Logging
     httpClient.addRequestModifier<dynamic>((request) {
-      print('--> [GetConnect Request] ${request.method.toUpperCase()} ${request.url}');
+      print('🌐 [API Request] ${request.method.toUpperCase()} ${request.url}');
       print('Headers: ${request.headers}');
       return request;
     });
 
     // Response Logging
     httpClient.addResponseModifier<dynamic>((request, response) {
-      print('<-- [GetConnect Response] Status: ${response.statusCode} | ${request.method.toUpperCase()} ${request.url}');
+      print('📥 [API Response] Status: ${response.statusCode} | ${request.method.toUpperCase()} ${request.url}');
       if (response.status.hasError) {
         print('Error details: ${response.statusText}');
       }
-      print('Body: ${response.body}');
+      print('Response Body: ${response.body}');
       return response;
     });
 
@@ -34,7 +34,9 @@ class QuestionProvider extends GetConnect {
   }
 
   Future<List<Question>> fetchQuestions(String category) async {
-    final response = await get('/questions', query: {'category': category});
+    final params = {'category': category};
+    print('🌐 [API Request] GET /questions | Query Params: $params');
+    final response = await get('/questions', query: params);
 
     if (response.status.hasError) {
       return Future.error(response.statusText ?? "Error fetching questions");
