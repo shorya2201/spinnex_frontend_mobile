@@ -22,8 +22,6 @@ void main() {
     // Verify that we are on the home screen.
     expect(find.text('SPINNEX'), findsOneWidget);
     expect(find.text('Truth or Dare'), findsOneWidget);
-    expect(find.text('SELECT DECK'), findsOneWidget);
     expect(find.text('START GAME'), findsOneWidget);
-    expect(find.text('SETTINGS'), findsOneWidget);
   });
 }

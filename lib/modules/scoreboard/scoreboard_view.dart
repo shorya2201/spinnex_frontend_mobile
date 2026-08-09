@@ -154,7 +154,7 @@ class ScoreboardView extends GetView<ScoreboardController> {
         padding: const EdgeInsets.all(24.0),
         child: ElevatedButton(
           onPressed: controller.playAgain,
-          child: const Text("NEW GAME"),
+          child: const Text("PLAY AGAIN"),
         ),
       ),
     );

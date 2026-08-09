@@ -41,11 +41,13 @@ class ChallengeController extends GetxController {
   }
 
   void completeChallenge() {
+    _timer?.cancel();
     onComplete(rewardPoints);
     Get.back();
   }
 
   void chickenOut() {
+    _timer?.cancel();
     onComplete(-1);
     Get.back();
   }

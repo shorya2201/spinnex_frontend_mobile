@@ -16,10 +16,11 @@ class Question {
   // Factory to convert JSON response to Question object
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
-      id: json['id'],
-      content: json['content'],
-      type: json['type'],
-      category: json['category'],
+      id: json['id'] as int? ?? 0,
+      content: json['content'] as String? ?? '',
+      type: json['type'] as String? ?? 'TRUTH',
+      category: json['category'] as String? ?? 'CLASSIC',
     );
   }
 }
+

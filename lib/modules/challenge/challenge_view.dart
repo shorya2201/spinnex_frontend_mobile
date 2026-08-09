@@ -272,7 +272,7 @@ class ChallengeView extends GetView<ChallengeController> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  controller.question.type.toUpperCase(),
+                  controller.typeLabel,
                   style: GoogleFonts.orbitron(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

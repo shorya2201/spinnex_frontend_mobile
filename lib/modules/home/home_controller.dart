@@ -34,7 +34,7 @@ class HomeController extends GetxController {
   // REST base URL (same host as the existing API service)
   static const String _restBase = 'https://spinnex-backend-dev.onrender.com/api/rooms';
 
-  StompService get _stomp => Get.find<StompService>();
+  StompService? get _stomp => Get.isRegistered<StompService>() ? Get.find<StompService>() : null;
 
   final List<String> categories = [
     'Classic (Family)',
@@ -242,13 +242,15 @@ class HomeController extends GetxController {
 
   void addPlayerWithInputName([String? customName]) {
     if (playerControllers.length >= 12) {
-      Get.snackbar(
-        "Limit Reached",
-        "Maximum of 12 players allowed.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber,
-        colorText: Colors.black,
-      );
+      if (Get.context != null) {
+        Get.snackbar(
+          "Limit Reached",
+          "Maximum of 12 players allowed.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.amber,
+          colorText: Colors.black,
+        );
+      }
       return;
     }
 
@@ -272,13 +274,15 @@ class HomeController extends GetxController {
     if (playerCount.value > 2) {
       playerCount.value--;
     } else {
-      Get.snackbar(
-        "Minimum Players",
-        "At least 2 players are required to spin the bottle!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber,
-        colorText: Colors.black,
-      );
+      if (Get.context != null) {
+        Get.snackbar(
+          "Minimum Players",
+          "At least 2 players are required to spin the bottle!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.amber,
+          colorText: Colors.black,
+        );
+      }
     }
   }
 
@@ -294,13 +298,15 @@ class HomeController extends GetxController {
       }
       playerCount.value = playerControllers.length;
     } else if (playerCount.value <= 2) {
-      Get.snackbar(
-        "Minimum Players",
-        "At least 2 players are required to spin the bottle!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber,
-        colorText: Colors.black,
-      );
+      if (Get.context != null) {
+        Get.snackbar(
+          "Minimum Players",
+          "At least 2 players are required to spin the bottle!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.amber,
+          colorText: Colors.black,
+        );
+      }
     }
   }
 
@@ -327,7 +333,7 @@ class HomeController extends GetxController {
   Future<void> startGame() async {
     // If online mode and host, publish start game WS frame to notify all room members
     if (isOnlineMode.value && isHost.value && roomCode.value.isNotEmpty) {
-      _stomp.sendStartGame(roomCode: roomCode.value, hostId: myPlayerId.value);
+      _stomp?.sendStartGame(roomCode: roomCode.value, hostId: myPlayerId.value);
     }
 
     isLoading.value = true;
@@ -364,13 +370,15 @@ class HomeController extends GetxController {
         },
       );
     } catch (e) {
-      Get.snackbar(
-        "Network Error",
-        "Cannot reach server. Loading offline backup deck...",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
+      if (Get.context != null) {
+        Get.snackbar(
+          "Network Error",
+          "Cannot reach server. Loading offline backup deck...",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -438,9 +446,9 @@ class HomeController extends GetxController {
       _syncPlayersFromJson(data.activePlayers);
 
       // ── STOMP subscriptions ───────────────────────────────────
-      _stomp.connect();
-      _stomp.subscribe('/topic/room/${data.roomCode}', _handleRoomStateUpdate);
-      _stomp.subscribe('/topic/room/${data.roomCode}/host', _handleHostNotification);
+      _stomp?.connect();
+      _stomp?.subscribe('/topic/room/${data.roomCode}', _handleRoomStateUpdate);
+      _stomp?.subscribe('/topic/room/${data.roomCode}/host', _handleHostNotification);
 
       Get.snackbar(
         '🎉 Room Created!',
@@ -510,9 +518,9 @@ class HomeController extends GetxController {
       isOnlineMode.value = true;
 
       // Connect STOMP
-      _stomp.connect();
-      _stomp.subscribe('/topic/room/${data.roomCode}', _handleRoomStateUpdate);
-      _stomp.subscribe('/topic/user/${data.playerId}/notifications', _handlePrivateNotification);
+      _stomp?.connect();
+      _stomp?.subscribe('/topic/room/${data.roomCode}', _handleRoomStateUpdate);
+      _stomp?.subscribe('/topic/user/${data.playerId}/notifications', _handlePrivateNotification);
 
       if (data.roomState != null) {
         _syncPlayersFromJson(data.roomState!.activePlayers);
@@ -552,9 +560,9 @@ class HomeController extends GetxController {
   /// Leave the current online room and reset state.
   void leaveOnlineRoom() {
     if (roomCode.value.isNotEmpty && myPlayerId.value.isNotEmpty) {
-      _stomp.sendLeave(roomCode: roomCode.value, playerId: myPlayerId.value);
+      _stomp?.sendLeave(roomCode: roomCode.value, playerId: myPlayerId.value);
     }
-    _stomp.disconnect();
+    _stomp?.disconnect();
     isOnlineMode.value = false;
     roomCode.value = '';
     myPlayerId.value = '';

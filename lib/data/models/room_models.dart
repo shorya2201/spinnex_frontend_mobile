@@ -206,7 +206,7 @@ class HostNotification {
     // The guest details may be nested under 'pendingPlayers[0]' or flat
     final pending = json['pendingPlayers'] as List<dynamic>?;
     final guest = pending != null && pending.isNotEmpty
-        ? pending.first as Map<String, dynamic>
+        ? Map<String, dynamic>.from(pending.first as Map)
         : json;
 
     return HostNotification(
