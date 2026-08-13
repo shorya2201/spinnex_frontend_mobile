@@ -12,15 +12,20 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.offWhiteBackground,
+      backgroundColor: const Color(0xFF090D16),
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppTheme.offWhiteGradient,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 0.95,
+            colors: [
+              Color(0xFF161F33),
+              Color(0xFF0D121D),
+              Color(0xFF070A10),
+            ],
+            stops: [0.0, 0.55, 1.0],
           ),
         ),
         child: SafeArea(
@@ -38,7 +43,7 @@ class HomeView extends GetView<HomeController> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.neonPink.withOpacity(0.12),
+                        color: AppTheme.neonPink.withValues(alpha: 0.22),
                         blurRadius: 100,
                         spreadRadius: 30,
                       ),
@@ -56,7 +61,7 @@ class HomeView extends GetView<HomeController> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.neonCyan.withOpacity(0.12),
+                        color: AppTheme.neonCyan.withValues(alpha: 0.2),
                         blurRadius: 90,
                         spreadRadius: 25,
                       ),
@@ -74,7 +79,7 @@ class HomeView extends GetView<HomeController> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.neonGreen.withOpacity(0.08),
+                        color: const Color(0xFFFF5722).withValues(alpha: 0.18),
                         blurRadius: 100,
                         spreadRadius: 20,
                       ),
@@ -147,7 +152,7 @@ class HomeView extends GetView<HomeController> {
     return PreferredSize(
       preferredSize: const Size.fromHeight(60),
       child: AppBar(
-        backgroundColor: AppTheme.offWhiteBackground.withOpacity(0.85),
+        backgroundColor: const Color(0xFF090D16).withValues(alpha: 0.85),
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -159,15 +164,15 @@ class HomeView extends GetView<HomeController> {
               height: 36,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTheme.neonPink, AppTheme.neonCyan],
+                  colors: [AppTheme.neonPink, Color(0xFFFF5722)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.neonPink.withOpacity(0.35),
-                    blurRadius: 8,
+                    color: AppTheme.neonPink.withValues(alpha: 0.5),
+                    blurRadius: 10,
                     spreadRadius: 1,
                   ),
                 ],
@@ -189,108 +194,122 @@ class HomeView extends GetView<HomeController> {
                 fontSize: 19,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2.8,
-                color: AppTheme.textDarkSlate,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: AppTheme.neonPink.withValues(alpha: 0.5),
+                    blurRadius: 12,
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
               decoration: BoxDecoration(
-                color: AppTheme.neonPink.withOpacity(0.12),
+                color: AppTheme.neonPink.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: AppTheme.neonPink,
                   width: 1,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.neonPink.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                  ),
+                ],
               ),
               child: Text(
                 "PARTY",
                 style: GoogleFonts.orbitron(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.neonPink,
+                  color: Colors.white,
                   letterSpacing: 1.2,
                 ),
               ),
             ),
           ],
         ),
-            actions: [
-              // Audio Toggle Button
-              Obx(
-                () => GestureDetector(
-                  onTap: () => controller.isMusicOn.toggle(),
-                  child: Tooltip(
-                    message: controller.isMusicOn.value
-                        ? "Audio Enabled"
-                        : "Audio Muted",
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 36,
-                      height: 36,
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceWhite,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: controller.isMusicOn.value
-                              ? AppTheme.neonGreen
-                              : AppTheme.borderLight,
-                          width: 1.2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.textDarkSlate.withOpacity(0.05),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        controller.isMusicOn.value
-                            ? Icons.volume_up_rounded
-                            : Icons.volume_off_rounded,
+        actions: [
+          // Audio Toggle Button
+          Obx(
+            () => GestureDetector(
+              onTap: () => controller.isMusicOn.toggle(),
+              child: Tooltip(
+                message: controller.isMusicOn.value
+                    ? "Audio Enabled"
+                    : "Audio Muted",
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 36,
+                  height: 36,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF131C2E),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: controller.isMusicOn.value
+                          ? AppTheme.neonGreen
+                          : const Color(0xFF1E293B),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
                         color: controller.isMusicOn.value
-                            ? AppTheme.neonGreen
-                            : AppTheme.textSubtleSlate,
-                        size: 18,
+                            ? AppTheme.neonGreen.withValues(alpha: 0.3)
+                            : Colors.transparent,
+                        blurRadius: 6,
                       ),
-                    ),
+                    ],
+                  ),
+                  child: Icon(
+                    controller.isMusicOn.value
+                        ? Icons.volume_up_rounded
+                        : Icons.volume_off_rounded,
+                    color: controller.isMusicOn.value
+                        ? AppTheme.neonGreen
+                        : const Color(0xFF94A3B8),
+                    size: 18,
                   ),
                 ),
               ),
-              // How to Play Info Button
-              GestureDetector(
-                onTap: () => _showHowToPlayModal(context),
-                child: Tooltip(
-                  message: "How to Play",
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    margin: const EdgeInsets.only(right: 14),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceWhite,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.neonCyan,
-                        width: 1.2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.neonCyan.withOpacity(0.2),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.help_outline_rounded,
-                      color: AppTheme.neonCyan,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
+          // How to Play Info Button
+          GestureDetector(
+            onTap: () => _showHowToPlayModal(context),
+            child: Tooltip(
+              message: "How to Play",
+              child: Container(
+                width: 36,
+                height: 36,
+                margin: const EdgeInsets.only(right: 14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF131C2E),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.neonCyan,
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.neonCyan.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.help_outline_rounded,
+                  color: AppTheme.neonCyan,
+                  size: 18,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -300,21 +319,17 @@ class HomeView extends GetView<HomeController> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceWhite,
+        color: const Color(0xFF131C2E),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.neonPink.withOpacity(0.3),
+          color: AppTheme.neonPink.withValues(alpha: 0.35),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textDarkSlate.withOpacity(0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: AppTheme.neonPink.withOpacity(0.08),
-            blurRadius: 12,
+            color: AppTheme.neonPink.withValues(alpha: 0.15),
+            blurRadius: 20,
+            spreadRadius: 1,
           ),
         ],
       ),
@@ -325,12 +340,12 @@ class HomeView extends GetView<HomeController> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [AppTheme.neonPink, AppTheme.neonCyan],
+                colors: [AppTheme.neonPink, Color(0xFFFF5722)],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.neonPink.withOpacity(0.3),
+                  color: AppTheme.neonPink.withValues(alpha: 0.4),
                   blurRadius: 10,
                 ),
               ],
@@ -370,19 +385,26 @@ class HomeView extends GetView<HomeController> {
             style: GoogleFonts.righteous(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textDarkSlate,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: AppTheme.neonPink.withValues(alpha: 0.5),
+                  blurRadius: 16,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 4),
 
           // Catchy Subtitle
-          Text(
+          const Text(
             "Assemble your squad, spin the bottle & unveil secrets! 🔥",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
-              color: AppTheme.textSubtleSlate,
+              color: Color(0xFF94A3B8),
               letterSpacing: 0.3,
               height: 1.3,
             ),
@@ -434,10 +456,10 @@ class HomeView extends GetView<HomeController> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: const Color(0xFF0B101D),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: color.withOpacity(0.4),
+          color: color.withValues(alpha: 0.4),
           width: 1,
         ),
       ),
@@ -454,7 +476,7 @@ class HomeView extends GetView<HomeController> {
               style: GoogleFonts.orbitron(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textDarkSlate,
+                color: Colors.white,
               ),
             ),
           ),
@@ -478,10 +500,10 @@ class HomeView extends GetView<HomeController> {
               Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonPink.withOpacity(0.12),
+                  color: AppTheme.neonPink.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppTheme.neonPink.withOpacity(0.4),
+                    color: AppTheme.neonPink.withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),
@@ -497,7 +519,7 @@ class HomeView extends GetView<HomeController> {
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: AppTheme.textDarkSlate,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -514,15 +536,15 @@ class HomeView extends GetView<HomeController> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceWhite,
+        color: const Color(0xFF131C2E),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.borderLight,
+          color: const Color(0xFF1E293B),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textDarkSlate.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -558,20 +580,27 @@ class HomeView extends GetView<HomeController> {
             fontSize: 14,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
-            color: AppTheme.textDarkSlate,
+            color: Colors.white,
           ),
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: isReady
-                ? AppTheme.neonGreen.withOpacity(0.12)
-                : AppTheme.neonAmber.withOpacity(0.12),
+                ? AppTheme.neonGreen.withValues(alpha: 0.15)
+                : AppTheme.neonAmber.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isReady ? AppTheme.neonGreen : AppTheme.neonAmber,
               width: 1.5,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: (isReady ? AppTheme.neonGreen : AppTheme.neonAmber)
+                    .withValues(alpha: 0.25),
+                blurRadius: 8,
+              ),
+            ],
           ),
           child: Text(
             isReady ? "READY TO SPIN" : "NEED 2+ PLAYERS",
@@ -608,8 +637,8 @@ class HomeView extends GetView<HomeController> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  playerColor.withOpacity(0.25),
-                  playerColor.withOpacity(0.12),
+                  playerColor.withValues(alpha: 0.3),
+                  playerColor.withValues(alpha: 0.15),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -621,7 +650,7 @@ class HomeView extends GetView<HomeController> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: playerColor.withOpacity(0.25),
+                  color: playerColor.withValues(alpha: 0.35),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -636,14 +665,12 @@ class HomeView extends GetView<HomeController> {
                   height: 26,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceWhite,
+                    color: const Color(0xFF0B101D),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 4,
-                      ),
-                    ],
+                    border: Border.all(
+                      color: playerColor.withValues(alpha: 0.5),
+                      width: 1,
+                    ),
                   ),
                   child: Text(
                     emoji,
@@ -661,7 +688,7 @@ class HomeView extends GetView<HomeController> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppTheme.textDarkSlate,
+                        color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
@@ -678,13 +705,13 @@ class HomeView extends GetView<HomeController> {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: playerColor.withOpacity(0.2),
+                        color: playerColor.withValues(alpha: 0.25),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
                         size: 13,
-                        color: AppTheme.textDarkSlate,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -701,10 +728,10 @@ class HomeView extends GetView<HomeController> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FD),
+        color: const Color(0xFF0B101D),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppTheme.borderLight,
+          color: const Color(0xFF1E293B),
           width: 1,
         ),
       ),
@@ -716,10 +743,10 @@ class HomeView extends GetView<HomeController> {
               height: 48,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceWhite,
+                color: const Color(0xFF131C2E),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppTheme.borderLight,
+                  color: const Color(0xFF1E293B),
                   width: 1,
                 ),
               ),
@@ -727,7 +754,7 @@ class HomeView extends GetView<HomeController> {
               child: TextField(
                 controller: controller.newPlayerInputController,
                 style: const TextStyle(
-                  color: AppTheme.textDarkSlate,
+                  color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -745,7 +772,7 @@ class HomeView extends GetView<HomeController> {
                   disabledBorder: InputBorder.none,
                   hintText: "Enter player name...",
                   hintStyle: TextStyle(
-                    color: AppTheme.textSubtleSlate,
+                    color: Color(0xFF64748B),
                     fontSize: 14,
                   ),
                 ),
@@ -765,7 +792,7 @@ class HomeView extends GetView<HomeController> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppTheme.neonGreen.withOpacity(0.12),
+                color: AppTheme.neonGreen.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: AppTheme.neonGreen,
@@ -773,7 +800,7 @@ class HomeView extends GetView<HomeController> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.neonGreen.withOpacity(0.2),
+                    color: AppTheme.neonGreen.withValues(alpha: 0.3),
                     blurRadius: 8,
                   ),
                 ],
@@ -803,7 +830,7 @@ class HomeView extends GetView<HomeController> {
         'icon': '🥂',
         'tag': 'Wild & Crazy',
         'color': AppTheme.neonPink,
-        'secondaryColor': const Color(0xFFD8006C),
+        'secondaryColor': const Color(0xFFFF5722),
       },
       'Spicy (Couples)': {
         'icon': '🌶️',
@@ -840,24 +867,26 @@ class HomeView extends GetView<HomeController> {
                   gradient: isSelected
                       ? LinearGradient(
                           colors: [
-                            accentColor.withOpacity(0.75),
-                            secondaryColor.withOpacity(0.75),
+                            accentColor.withValues(alpha: 0.85),
+                            secondaryColor.withValues(alpha: 0.85),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         )
                       : null,
-                  color: isSelected ? null : accentColor.withOpacity(0.06),
+                  color: isSelected ? null : const Color(0xFF131C2E),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? accentColor : AppTheme.borderLight,
+                    color: isSelected
+                        ? accentColor
+                        : accentColor.withValues(alpha: 0.25),
                     width: isSelected ? 2 : 1,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: isSelected
-                          ? accentColor.withOpacity(0.4)
-                          : AppTheme.textDarkSlate.withOpacity(0.04),
+                          ? accentColor.withValues(alpha: 0.45)
+                          : Colors.black.withValues(alpha: 0.2),
                       blurRadius: isSelected ? 12 : 6,
                       spreadRadius: isSelected ? 1 : 0,
                       offset: const Offset(0, 3),
@@ -873,19 +902,19 @@ class HomeView extends GetView<HomeController> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppTheme.surfaceWhite
-                            : const Color(0xFFF1F5F9),
+                            ? Colors.black.withValues(alpha: 0.3)
+                            : const Color(0xFF0B101D),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isSelected
-                              ? AppTheme.surfaceWhite
-                              : AppTheme.borderLight,
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : const Color(0xFF1E293B),
                           width: 1.5,
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
+                                  color: Colors.black.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
@@ -899,7 +928,7 @@ class HomeView extends GetView<HomeController> {
                             )
                           : Icon(
                               details['icon'] as IconData,
-                              color: isSelected ? accentColor : AppTheme.textSubtleSlate,
+                              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
                               size: 20,
                             ),
                     ),
@@ -913,7 +942,7 @@ class HomeView extends GetView<HomeController> {
                         fontSize: 11,
                         fontWeight:
                             isSelected ? FontWeight.w900 : FontWeight.w700,
-                        color: isSelected ? Colors.white : AppTheme.textDarkSlate,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -921,8 +950,8 @@ class HomeView extends GetView<HomeController> {
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.black.withOpacity(0.15)
-                            : accentColor.withOpacity(0.12),
+                            ? Colors.black.withValues(alpha: 0.25)
+                            : accentColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -953,14 +982,14 @@ class HomeView extends GetView<HomeController> {
   Widget _buildSettingsCard() {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceWhite,
+        color: const Color(0xFF131C2E),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppTheme.borderLight,
+          color: const Color(0xFF1E293B),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textDarkSlate.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -972,7 +1001,7 @@ class HomeView extends GetView<HomeController> {
             title: const Text(
               "Music & Audio SFX",
               style: TextStyle(
-                color: AppTheme.textDarkSlate,
+                color: Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -980,7 +1009,7 @@ class HomeView extends GetView<HomeController> {
             subtitle: const Text(
               "Enable party beats & sound effects",
               style: TextStyle(
-                color: AppTheme.textSubtleSlate,
+                color: Color(0xFF94A3B8),
                 fontSize: 11,
               ),
             ),
@@ -990,33 +1019,33 @@ class HomeView extends GetView<HomeController> {
             activeColor: AppTheme.neonGreen,
             onChanged: (val) => controller.isMusicOn.value = val,
           ),
-          const Divider(color: AppTheme.borderLight, height: 1),
+          const Divider(color: Color(0xFF1E293B), height: 1),
           ListTile(
             dense: true,
             leading: const Icon(Icons.star_rate_rounded, color: AppTheme.neonAmber, size: 22),
             title: const Text(
               "Rate Application",
-              style: TextStyle(color: AppTheme.textDarkSlate, fontSize: 13),
+              style: TextStyle(color: Colors.white, fontSize: 13),
             ),
             trailing: const Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textSubtleSlate,
+              color: Color(0xFF94A3B8),
               size: 20,
             ),
             onTap: () => controller.launchURL("https://play.google.com/store"),
           ),
-          const Divider(color: AppTheme.borderLight, height: 1),
+          const Divider(color: Color(0xFF1E293B), height: 1),
           ListTile(
             dense: true,
             leading:
                 const Icon(Icons.mail_rounded, color: AppTheme.neonCyan, size: 22),
             title: const Text(
               "Contact Developer",
-              style: TextStyle(color: AppTheme.textDarkSlate, fontSize: 13),
+              style: TextStyle(color: Colors.white, fontSize: 13),
             ),
             trailing: const Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textSubtleSlate,
+              color: Color(0xFF94A3B8),
               size: 20,
             ),
             onTap: () => controller.launchURL("mailto:proffshorya@gmail.com"),
@@ -1036,16 +1065,16 @@ class HomeView extends GetView<HomeController> {
         bottom: 14,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.offWhiteBackground.withOpacity(0.92),
+        color: const Color(0xFF090D16).withValues(alpha: 0.94),
         border: const Border(
           top: BorderSide(
-            color: AppTheme.borderLight,
+            color: Color(0xFF1E293B),
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textDarkSlate.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -1068,14 +1097,15 @@ class HomeView extends GetView<HomeController> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),
-                  elevation: 6,
-                  shadowColor: AppTheme.neonPink.withOpacity(0.4),
+                  elevation: 8,
+                  shadowColor: AppTheme.neonPink.withValues(alpha: 0.5),
                 ),
                 child: Ink(
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
                         AppTheme.neonPink,
+                        Color(0xFFFF5722),
                         AppTheme.neonCyan,
                       ],
                       begin: Alignment.centerLeft,
@@ -1114,15 +1144,15 @@ class HomeView extends GetView<HomeController> {
               height: 52,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppTheme.neonAmber.withOpacity(0.12),
+                color: AppTheme.neonAmber.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(26),
                 border: Border.all(
-                  color: AppTheme.neonAmber.withOpacity(0.8),
+                  color: AppTheme.neonAmber.withValues(alpha: 0.8),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.neonAmber.withOpacity(0.15),
+                    color: AppTheme.neonAmber.withValues(alpha: 0.2),
                     blurRadius: 10,
                   ),
                 ],
@@ -1163,15 +1193,15 @@ class HomeView extends GetView<HomeController> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceWhite,
+            color: const Color(0xFF0D121D),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
-              color: AppTheme.neonCyan.withOpacity(0.4),
+              color: AppTheme.neonCyan.withValues(alpha: 0.4),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.textDarkSlate.withOpacity(0.12),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 25,
                 offset: const Offset(0, -8),
               ),
@@ -1190,7 +1220,7 @@ class HomeView extends GetView<HomeController> {
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: AppTheme.neonCyan.withOpacity(0.15),
+                          color: AppTheme.neonCyan.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -1206,7 +1236,7 @@ class HomeView extends GetView<HomeController> {
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.5,
-                          color: AppTheme.textDarkSlate,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -1216,12 +1246,12 @@ class HomeView extends GetView<HomeController> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFF1F5F9),
+                        color: Color(0xFF1E293B),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
-                        color: AppTheme.textSubtleSlate,
+                        color: Colors.white,
                         size: 20,
                       ),
                     ),
@@ -1300,7 +1330,7 @@ class HomeView extends GetView<HomeController> {
           height: 32,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.15),
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 1.5),
           ),
@@ -1321,7 +1351,7 @@ class HomeView extends GetView<HomeController> {
               Text(
                 title,
                 style: const TextStyle(
-                  color: AppTheme.textDarkSlate,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -1330,7 +1360,7 @@ class HomeView extends GetView<HomeController> {
               Text(
                 subtitle,
                 style: const TextStyle(
-                  color: AppTheme.textSubtleSlate,
+                  color: Color(0xFF94A3B8),
                   fontSize: 12,
                   height: 1.3,
                 ),
@@ -1378,12 +1408,12 @@ class HomeView extends GetView<HomeController> {
       final online = controller.isOnlineMode.value;
       return Container(
         decoration: BoxDecoration(
-          color: AppTheme.surfaceWhite,
+          color: const Color(0xFF131C2E),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.borderLight),
+          border: Border.all(color: const Color(0xFF1E293B)),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.textDarkSlate.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -1421,13 +1451,13 @@ class HomeView extends GetView<HomeController> {
               : null,
           borderRadius: BorderRadius.circular(16),
           boxShadow: active
-              ? [BoxShadow(color: AppTheme.neonPink.withOpacity(0.3), blurRadius: 10)]
+              ? [BoxShadow(color: AppTheme.neonPink.withValues(alpha: 0.35), blurRadius: 10)]
               : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: active ? Colors.white : AppTheme.textSubtleSlate),
+            Icon(icon, size: 16, color: active ? Colors.white : const Color(0xFF94A3B8)),
             const SizedBox(width: 7),
             Text(
               label,
@@ -1435,7 +1465,7 @@ class HomeView extends GetView<HomeController> {
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.5,
-                color: active ? Colors.white : AppTheme.textSubtleSlate,
+                color: active ? Colors.white : const Color(0xFF94A3B8),
               ),
             ),
           ],
@@ -1497,9 +1527,9 @@ class HomeView extends GetView<HomeController> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppTheme.neonCyan.withOpacity(0.06),
+                color: AppTheme.neonCyan.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.neonCyan.withOpacity(0.3)),
+                border: Border.all(color: AppTheme.neonCyan.withValues(alpha: 0.35)),
               ),
               child: const Row(
                 children: [
@@ -1508,7 +1538,7 @@ class HomeView extends GetView<HomeController> {
                   Expanded(
                     child: Text(
                       'Create a room and share the code. Friends join in real-time!',
-                      style: TextStyle(fontSize: 12, color: AppTheme.textSubtleSlate, height: 1.4),
+                      style: TextStyle(fontSize: 12, color: Color(0xFFCBD5E1), height: 1.4),
                     ),
                   ),
                 ],
@@ -1532,11 +1562,11 @@ class HomeView extends GetView<HomeController> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceWhite,
+          color: const Color(0xFF131C2E),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
           boxShadow: [
-            BoxShadow(color: color.withOpacity(0.12), blurRadius: 14, offset: const Offset(0, 4)),
+            BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 14, offset: const Offset(0, 4)),
           ],
         ),
         child: Column(
@@ -1546,17 +1576,17 @@ class HomeView extends GetView<HomeController> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
-                border: Border.all(color: color.withOpacity(0.4)),
+                border: Border.all(color: color.withValues(alpha: 0.5)),
               ),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(height: 10),
             Text(title,
-                style: GoogleFonts.orbitron(fontSize: 12, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+                style: GoogleFonts.orbitron(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white)),
             const SizedBox(height: 4),
-            Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.textSubtleSlate)),
+            Text(subtitle, style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
           ],
         ),
       ),
@@ -1567,11 +1597,11 @@ class HomeView extends GetView<HomeController> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceWhite,
+        color: const Color(0xFF131C2E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
-          BoxShadow(color: AppTheme.neonGreen.withOpacity(0.1), blurRadius: 16, offset: const Offset(0, 4)),
+          BoxShadow(color: AppTheme.neonGreen.withValues(alpha: 0.15), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -1582,9 +1612,9 @@ class HomeView extends GetView<HomeController> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonGreen.withOpacity(0.12),
+                  color: AppTheme.neonGreen.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppTheme.neonGreen.withOpacity(0.5)),
+                  border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
                 ),
                 child: const Icon(Icons.wifi_rounded, color: AppTheme.neonGreen, size: 14),
               ),
@@ -1608,9 +1638,9 @@ class HomeView extends GetView<HomeController> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: AppTheme.neonPink.withOpacity(0.1),
+                    color: AppTheme.neonPink.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.neonPink.withOpacity(0.5)),
+                    border: Border.all(color: AppTheme.neonPink.withValues(alpha: 0.5)),
                   ),
                   child: const Text('Leave', style: TextStyle(color: AppTheme.neonPink, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
@@ -1624,14 +1654,14 @@ class HomeView extends GetView<HomeController> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: AppTheme.neonGreen.withOpacity(0.08),
+                    color: const Color(0xFF0B101D),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.neonGreen.withOpacity(0.4)),
+                    border: Border.all(color: AppTheme.neonGreen.withValues(alpha: 0.5)),
                   ),
                   child: Center(
                     child: Text(
                       controller.roomCode.value,
-                      style: GoogleFonts.orbitron(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 4, color: AppTheme.textDarkSlate),
+                      style: GoogleFonts.orbitron(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white),
                     ),
                   ),
                 ),
@@ -1645,11 +1675,11 @@ class HomeView extends GetView<HomeController> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceWhite,
+                    color: const Color(0xFF0B101D),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.borderLight),
+                    border: Border.all(color: const Color(0xFF1E293B)),
                   ),
-                  child: const Icon(Icons.copy_rounded, size: 18, color: AppTheme.textSubtleSlate),
+                  child: const Icon(Icons.copy_rounded, size: 18, color: Colors.white),
                 ),
               ),
               const SizedBox(width: 8),
@@ -1678,7 +1708,7 @@ class HomeView extends GetView<HomeController> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: p.color.withOpacity(0.1),
+                    color: p.color.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: isPending ? AppTheme.neonAmber : p.color),
                   ),
@@ -1687,7 +1717,7 @@ class HomeView extends GetView<HomeController> {
                     children: [
                       Text(p.emoji, style: const TextStyle(fontSize: 13)),
                       const SizedBox(width: 5),
-                      Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDarkSlate)),
+                      Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
                       if (p.host) ...[const SizedBox(width: 4), const Icon(Icons.star_rounded, size: 12, color: AppTheme.neonAmber)],
                       if (isPending) ...[const SizedBox(width: 4), const Icon(Icons.hourglass_top_rounded, size: 12, color: AppTheme.neonAmber)],
                     ],
@@ -1712,7 +1742,7 @@ class HomeView extends GetView<HomeController> {
               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             ),
             decoration: const BoxDecoration(
-              color: AppTheme.offWhiteBackground,
+              color: Color(0xFF0D121D),
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -1720,12 +1750,12 @@ class HomeView extends GetView<HomeController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(child: Container(width: 40, height: 4,
-                    decoration: BoxDecoration(color: AppTheme.borderLight, borderRadius: BorderRadius.circular(2)))),
+                    decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(2)))),
                 const SizedBox(height: 20),
                 Text('Create Cyber Room 🎮',
-                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
                 const SizedBox(height: 6),
-                const Text('Set up a room and invite your squad', style: TextStyle(color: AppTheme.textSubtleSlate, fontSize: 13)),
+                const Text('Set up a room and invite your squad', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
                 const SizedBox(height: 20),
                 _buildSectionHeader(title: 'CATEGORY', icon: Icons.style_rounded),
                 const SizedBox(height: 10),
@@ -1733,10 +1763,18 @@ class HomeView extends GetView<HomeController> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: nameCtrl,
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Your Name (Host)',
+                    labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
                     hintText: 'Enter your display name',
-                    prefixIcon: const Icon(Icons.person_rounded),
+                    hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                    prefixIcon: const Icon(Icons.person_rounded, color: AppTheme.neonGreen),
+                    filled: true,
+                    fillColor: const Color(0xFF131C2E),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFF1E293B), width: 1)),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -1769,7 +1807,7 @@ class HomeView extends GetView<HomeController> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       elevation: 4,
-                      shadowColor: AppTheme.neonGreen.withOpacity(0.4),
+                      shadowColor: AppTheme.neonGreen.withValues(alpha: 0.4),
                     ),
                   ),
                 )),
@@ -1794,7 +1832,7 @@ class HomeView extends GetView<HomeController> {
               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             ),
             decoration: const BoxDecoration(
-              color: AppTheme.offWhiteBackground,
+              color: Color(0xFF0D121D),
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -1802,22 +1840,30 @@ class HomeView extends GetView<HomeController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(child: Container(width: 40, height: 4,
-                    decoration: BoxDecoration(color: AppTheme.borderLight, borderRadius: BorderRadius.circular(2)))),
+                    decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(2)))),
                 const SizedBox(height: 20),
                 Text('Join Arena 🎯',
-                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.textDarkSlate)),
+                    style: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
                 const SizedBox(height: 6),
-                const Text('Enter the room code shared by your host', style: TextStyle(color: AppTheme.textSubtleSlate, fontSize: 13)),
+                const Text('Enter the room code shared by your host', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
                 const SizedBox(height: 20),
                 TextField(
                   controller: codeCtrl,
                   textCapitalization: TextCapitalization.characters,
                   maxLength: 10,
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Room Code',
+                    labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
                     hintText: 'e.g. SPIN88',
-                    prefixIcon: const Icon(Icons.tag_rounded),
+                    hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                    prefixIcon: const Icon(Icons.tag_rounded, color: AppTheme.neonCyan),
                     counterText: '',
+                    filled: true,
+                    fillColor: const Color(0xFF131C2E),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFF1E293B), width: 1)),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -1827,10 +1873,18 @@ class HomeView extends GetView<HomeController> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: nameCtrl,
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Your Name',
+                    labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
                     hintText: 'Enter your display name',
-                    prefixIcon: const Icon(Icons.person_rounded),
+                    hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                    prefixIcon: const Icon(Icons.person_rounded, color: AppTheme.neonCyan),
+                    filled: true,
+                    fillColor: const Color(0xFF131C2E),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFF1E293B), width: 1)),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -1864,7 +1918,7 @@ class HomeView extends GetView<HomeController> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       elevation: 4,
-                      shadowColor: AppTheme.neonCyan.withOpacity(0.4),
+                      shadowColor: AppTheme.neonCyan.withValues(alpha: 0.4),
                     ),
                   ),
                 )),
@@ -1954,15 +2008,15 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceWhite,
+          color: const Color(0xFF0D121D),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           border: Border.all(
-            color: AppTheme.borderLight,
+            color: const Color(0xFF1E293B),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.textDarkSlate.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               offset: const Offset(0, -6),
             ),
@@ -1983,7 +2037,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
-                      color: AppTheme.textDarkSlate,
+                      color: Colors.white,
                     ),
                   ),
                   GestureDetector(
@@ -1991,12 +2045,12 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFF1F5F9),
+                        color: Color(0xFF1E293B),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
-                        color: AppTheme.textSubtleSlate,
+                        color: Colors.white,
                         size: 20,
                       ),
                     ),
@@ -2016,7 +2070,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                           height: 56,
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceWhite,
+                            color: const Color(0xFF131C2E),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: _selectedColor,
@@ -2034,7 +2088,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                                 child: TextField(
                                   controller: _nameController,
                                   style: const TextStyle(
-                                    color: AppTheme.textDarkSlate,
+                                    color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -2059,7 +2113,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                           top: -8,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
-                            color: AppTheme.surfaceWhite,
+                            color: const Color(0xFF0D121D),
                             child: Text(
                               "Player Name",
                               style: TextStyle(
@@ -2081,7 +2135,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FD),
+                        color: const Color(0xFF131C2E),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: _selectedColor,
@@ -2090,7 +2144,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                       ),
                       child: const Icon(
                         Icons.casino_rounded,
-                        color: AppTheme.textDarkSlate,
+                        color: Colors.white,
                         size: 26,
                       ),
                     ),
@@ -2109,14 +2163,14 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
-                      color: AppTheme.textSubtleSlate,
+                      color: const Color(0xFF94A3B8),
                     ),
                   ),
                   const Text(
                     "🔒 = Taken by player",
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppTheme.textSubtleSlate,
+                      color: Color(0xFF94A3B8),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -2177,16 +2231,16 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? _selectedColor.withOpacity(0.12)
-                                  : const Color(0xFFF1F5F9),
+                                  ? _selectedColor.withValues(alpha: 0.25)
+                                  : const Color(0xFF131C2E),
                               shape: BoxShape.circle,
                               border: isSelected
                                   ? Border.all(color: _selectedColor, width: 2.5)
-                                  : Border.all(color: AppTheme.borderLight, width: 1),
+                                  : Border.all(color: const Color(0xFF1E293B), width: 1),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: _selectedColor.withOpacity(0.4),
+                                        color: _selectedColor.withValues(alpha: 0.4),
                                         blurRadius: 8,
                                       )
                                     ]
@@ -2209,7 +2263,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFF1744),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: AppTheme.surfaceWhite, width: 1.5),
+                                  border: Border.all(color: const Color(0xFF0D121D), width: 1.5),
                                 ),
                                 child: const Icon(
                                   Icons.lock_rounded,
@@ -2233,7 +2287,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: AppTheme.textSubtleSlate,
+                  color: const Color(0xFF94A3B8),
                 ),
               ),
               const SizedBox(height: 14),
@@ -2263,12 +2317,12 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                           color: color,
                           shape: BoxShape.circle,
                           border: isSelected
-                              ? Border.all(color: AppTheme.textDarkSlate, width: 3)
+                              ? Border.all(color: Colors.white, width: 3)
                               : null,
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: color.withOpacity(0.6),
+                                    color: color.withValues(alpha: 0.6),
                                     blurRadius: 10,
                                     spreadRadius: 1,
                                   ),
@@ -2340,7 +2394,7 @@ class _EditPlayerModalContentState extends State<_EditPlayerModalContent> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.neonPink,
                           elevation: 6,
-                          shadowColor: AppTheme.neonPink.withOpacity(0.4),
+                          shadowColor: AppTheme.neonPink.withValues(alpha: 0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
                           ),

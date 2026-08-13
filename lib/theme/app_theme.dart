@@ -19,6 +19,24 @@ class AppTheme {
   static const Color neonGreen = Color(0xFF10B981);
   static const Color neonAmber = Color(0xFFFFB800);
 
+  // ── Splash-screen gradients (reusable) ──────────────────────────────
+  static const LinearGradient splashNeonGradient = LinearGradient(
+    colors: [neonPink, neonCyan],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+
+  static const RadialGradient splashBackgroundGradient = RadialGradient(
+    center: Alignment.center,
+    radius: 1.1,
+    colors: [
+      Color(0xFFFCFDFF),
+      offWhiteBackground,
+      Color(0xFFEDF2FB),
+    ],
+    stops: [0.0, 0.5, 1.0],
+  );
+
   static final ThemeData offWhiteNeonTheme = ThemeData(
     brightness: Brightness.light,
     scaffoldBackgroundColor: offWhiteBackground,
@@ -46,7 +64,7 @@ class AppTheme {
     cardTheme: CardThemeData(
       color: surfaceWhite,
       elevation: 4,
-      shadowColor: textDarkSlate.withOpacity(0.06),
+      shadowColor: textDarkSlate.withValues(alpha: 0.06),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: borderLight, width: 1),
@@ -59,7 +77,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         elevation: 6,
-        shadowColor: neonPink.withOpacity(0.35),
+        shadowColor: neonPink.withValues(alpha: 0.35),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
