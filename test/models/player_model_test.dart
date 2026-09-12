@@ -104,5 +104,117 @@ void main() {
         expect(compositeEmojiPlayer.emoji, equals('👨‍👩‍👧‍👦'));
       });
     });
+
+    // --- MULTIPLAYER & SERIALIZATION TESTS ---
+    group('Multiplayer & Serialization Cases', () {
+      // Positive Cases
+      test('fromJson should parse complete JSON payload with multiplayer fields', () {
+        final json = {
+          'playerId': 'usr_test_101',
+          'name': 'CyberNinja',
+          'avatar': 'avatar_neon_5',
+          'status': 'ACTIVE',
+          'host': true,
+          'joinedAt': 1700000000,
+        };
+
+        final player = PlayerModel.fromJson(json, color: Colors.cyan, emoji: '🥷');
+
+        expect(player.playerId, equals('usr_test_101'));
+        expect(player.name, equals('CyberNinja'));
+        expect(player.avatar, equals('avatar_neon_5'));
+        expect(player.status, equals('ACTIVE'));
+        expect(player.host, isTrue);
+        expect(player.joinedAt, equals(1700000000));
+        expect(player.score, equals(0));
+        expect(player.color, equals(Colors.cyan));
+        expect(player.emoji, equals('🥷'));
+        expect(player.isActive, isTrue);
+      });
+
+      test('toJson should serialize all fields including joinedAt when set', () {
+        final player = PlayerModel(
+          name: 'CyberNinja',
+          playerId: 'usr_test_101',
+          avatar: 'avatar_neon_5',
+          status: 'ACTIVE',
+          host: true,
+          joinedAt: 1700000000,
+        );
+
+        final json = player.toJson();
+
+        expect(json['playerId'], equals('usr_test_101'));
+        expect(json['name'], equals('CyberNinja'));
+        expect(json['avatar'], equals('avatar_neon_5'));
+        expect(json['status'], equals('ACTIVE'));
+        expect(json['host'], isTrue);
+        expect(json['joinedAt'], equals(1700000000));
+      });
+
+      // Negative Cases
+      test('toJson should omit joinedAt when joinedAt is null', () {
+        final player = PlayerModel(
+          name: 'GuestBob',
+          playerId: 'usr_guest_2',
+        );
+
+        final json = player.toJson();
+
+        expect(json.containsKey('joinedAt'), isFalse);
+      });
+
+      test('isActive should return false for non-ACTIVE statuses', () {
+        final pending = PlayerModel(name: 'A', status: 'PENDING');
+        final denied = PlayerModel(name: 'B', status: 'DENIED');
+        final disconnected = PlayerModel(name: 'C', status: 'DISCONNECTED');
+        final unknown = PlayerModel(name: 'D', status: 'OTHER_STATUS');
+
+        expect(pending.isActive, isFalse);
+        expect(denied.isActive, isFalse);
+        expect(disconnected.isActive, isFalse);
+        expect(unknown.isActive, isFalse);
+      });
+
+      // Edge Cases
+      test('fromJson should handle empty map with safe default values', () {
+        final player = PlayerModel.fromJson(<String, dynamic>{});
+
+        expect(player.playerId, equals(''));
+        expect(player.name, equals('Player'));
+        expect(player.avatar, equals('avatar_neon_1'));
+        expect(player.status, equals('ACTIVE'));
+        expect(player.host, isFalse);
+        expect(player.joinedAt, isNull);
+        expect(player.score, equals(0));
+        expect(player.color, equals(const Color(0xFFFF007F)));
+        expect(player.emoji, equals('👾'));
+      });
+
+      test('round-trip serialization toJson and fromJson should maintain data integrity', () {
+        final original = PlayerModel(
+          name: 'Neon Queen',
+          playerId: 'usr_orig_99',
+          avatar: 'avatar_neon_4',
+          status: 'ACTIVE',
+          host: true,
+          joinedAt: 1712345678,
+          color: Colors.purple,
+          emoji: '👑',
+        );
+
+        final json = original.toJson();
+        final restored = PlayerModel.fromJson(json, color: original.color, emoji: original.emoji);
+
+        expect(restored.playerId, equals(original.playerId));
+        expect(restored.name, equals(original.name));
+        expect(restored.avatar, equals(original.avatar));
+        expect(restored.status, equals(original.status));
+        expect(restored.host, equals(original.host));
+        expect(restored.joinedAt, equals(original.joinedAt));
+        expect(restored.color, equals(original.color));
+        expect(restored.emoji, equals(original.emoji));
+      });
+    });
   });
 }
