@@ -53,28 +53,28 @@ class MockData {
 
   // --- Model Objects ---
   static final Question truthQuestion1 = Question(
-    id: 1,
+    id: '1',
     content: 'What is your biggest secret?',
     type: 'TRUTH',
     category: 'Party',
   );
 
   static final Question truthQuestion2 = Question(
-    id: 2,
+    id: '2',
     content: 'Who was your first crush?',
     type: 'TRUTH',
     category: 'Party',
   );
 
   static final Question dareQuestion1 = Question(
-    id: 3,
+    id: '3',
     content: 'Do 10 pushups right now!',
     type: 'DARE',
     category: 'Party',
   );
 
   static final Question dareQuestion2 = Question(
-    id: 4,
+    id: '4',
     content: 'Speak in an accent for the next 2 rounds',
     type: 'DARE',
     category: 'Party',

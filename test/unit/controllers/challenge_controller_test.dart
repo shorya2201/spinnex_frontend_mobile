@@ -5,7 +5,7 @@ import 'package:kaal_spinnex/data/models/question_model.dart';
 import 'package:kaal_spinnex/modules/challenge/challenge_controller.dart';
 
 Question _q(String type) => Question(
-      id: 1,
+      id: '1',
       content: 'Test question',
       type: type,
       category: 'CLASSIC',

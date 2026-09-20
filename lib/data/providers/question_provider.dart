@@ -3,13 +3,18 @@ import 'package:get/get.dart';
 import '../models/question_model.dart';
 
 class QuestionProvider extends GetConnect {
+  static const String defaultBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://spinnex-backend-dev.onrender.com/api',
+  );
+
   @override
   void onInit() {
     // Bypass SSL certificate check (required for self-signed/untrusted issuer certificates on mobile)
     allowAutoSignedCert = true;
 
-    // Set to live Render backend
-    baseUrl = 'https://spinnex-backend-dev.onrender.com/api';
+    // Set to live Render backend or environment override
+    baseUrl = defaultBaseUrl;
 
     // Increase timeout to 60 seconds to handle cold starts on Render
     httpClient.timeout = const Duration(seconds: 60);

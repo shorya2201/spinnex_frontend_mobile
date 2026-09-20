@@ -3,7 +3,22 @@ import 'package:kaal_spinnex/data/models/question_model.dart';
 
 void main() {
   group('Question.fromJson', () {
-    test('creates question from complete JSON', () {
+    test('creates question from complete JSON with MongoDB ObjectId string', () {
+      final json = {
+        'id': '6aaf8834761ea6137cf460f8',
+        'content': 'What is your biggest secret?',
+        'type': 'TRUTH',
+        'category': 'CLASSIC',
+      };
+      final q = Question.fromJson(json);
+
+      expect(q.id, '6aaf8834761ea6137cf460f8');
+      expect(q.content, 'What is your biggest secret?');
+      expect(q.type, 'TRUTH');
+      expect(q.category, 'CLASSIC');
+    });
+
+    test('backward compatibility: converts numeric int to String id', () {
       final json = {
         'id': 42,
         'content': 'What is your biggest secret?',
@@ -12,25 +27,34 @@ void main() {
       };
       final q = Question.fromJson(json);
 
-      expect(q.id, 42);
+      expect(q.id, '42');
       expect(q.content, 'What is your biggest secret?');
-      expect(q.type, 'TRUTH');
-      expect(q.category, 'CLASSIC');
     });
 
-    test('defaults id to 0 when missing', () {
+    test('defaults id to empty string when missing', () {
       final json = {
         'content': 'Do a dare!',
         'type': 'DARE',
         'category': 'PARTY',
       };
       final q = Question.fromJson(json);
-      expect(q.id, 0);
+      expect(q.id, '');
+    });
+
+    test('parses MongoDB native _id field when id is missing', () {
+      final json = {
+        '_id': '6aaf8834761ea6137cf460f8',
+        'content': 'Mongo question',
+        'type': 'TRUTH',
+        'category': 'CLASSIC',
+      };
+      final q = Question.fromJson(json);
+      expect(q.id, '6aaf8834761ea6137cf460f8');
     });
 
     test('defaults content to empty string when null', () {
       final json = <String, dynamic>{
-        'id': 1,
+        'id': '1',
         'content': null,
         'type': 'TRUTH',
         'category': 'CLASSIC',
@@ -41,7 +65,7 @@ void main() {
 
     test('defaults type to TRUTH when null', () {
       final json = <String, dynamic>{
-        'id': 2,
+        'id': '2',
         'content': 'Some question',
         'type': null,
         'category': 'PARTY',
@@ -52,7 +76,7 @@ void main() {
 
     test('defaults category to CLASSIC when null', () {
       final json = <String, dynamic>{
-        'id': 3,
+        'id': '3',
         'content': 'Some question',
         'type': 'DARE',
         'category': null,
@@ -64,7 +88,7 @@ void main() {
     test('handles lowercase type value (not normalized)', () {
       // The model stores as-is; consumers use toUpperCase() for comparisons
       final json = {
-        'id': 4,
+        'id': '4',
         'content': 'Tell a secret',
         'type': 'truth',
         'category': 'classic',
@@ -76,7 +100,7 @@ void main() {
 
     test('preserves unknown category string', () {
       final json = {
-        'id': 5,
+        'id': '5',
         'content': 'Sing a song',
         'type': 'DARE',
         'category': 'CUSTOM_CATEGORY',
@@ -87,10 +111,9 @@ void main() {
 
     test('handles completely empty JSON without throwing', () {
       final json = <String, dynamic>{};
-      // After the null-safety fix this should not throw
       expect(() => Question.fromJson(json), returnsNormally);
       final q = Question.fromJson(json);
-      expect(q.id, 0);
+      expect(q.id, '');
       expect(q.content, '');
     });
   });

@@ -273,7 +273,7 @@ void main() {
   group('HomeController – startGame', () {
     test('player with empty name gets "Player N" fallback', () async {
       when(mockRepo.getQuestions(any)).thenAnswer((_) async => [
-            Question(id: 1, content: 'Q', type: 'TRUTH', category: 'CLASSIC'),
+            Question(id: '1', content: 'Q', type: 'TRUTH', category: 'CLASSIC'),
           ]);
 
       final ctrl = _makeCtrl(mockRepo);

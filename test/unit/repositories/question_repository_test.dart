@@ -20,8 +20,8 @@ void main() {
 
   group('QuestionRepository.getQuestions', () {
     final sampleQuestions = [
-      Question(id: 1, content: 'Q1', type: 'TRUTH', category: 'CLASSIC'),
-      Question(id: 2, content: 'Q2', type: 'DARE', category: 'CLASSIC'),
+      Question(id: '1', content: 'Q1', type: 'TRUTH', category: 'CLASSIC'),
+      Question(id: '2', content: 'Q2', type: 'DARE', category: 'CLASSIC'),
     ];
 
     test('returns list from provider on success', () async {

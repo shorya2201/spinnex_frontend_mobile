@@ -112,7 +112,7 @@ void main() {
       test('should award 1 point if type is not strictly DARE', () {
         controller.onClose();
         final customQuestion = Question(
-          id: 99,
+          id: '99',
           content: 'Secret challenge',
           type: 'CUSTOM_TYPE',
           category: 'Party',

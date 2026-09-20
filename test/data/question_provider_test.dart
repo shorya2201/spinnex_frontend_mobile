@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:kaal_spinnex/data/models/question_model.dart';
 import 'package:kaal_spinnex/data/providers/question_provider.dart';
 
 /// Testable subclass of QuestionProvider that intercepts `get` calls

@@ -14,7 +14,7 @@ Widget _buildChallenge({
   Get.routing.args = {
     'player': PlayerModel(name: 'Alice', emoji: '💃'),
     'question': Question(
-      id: 1,
+      id: '1',
       content: content,
       type: type,
       category: 'CLASSIC',

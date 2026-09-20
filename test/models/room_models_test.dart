@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kaal_spinnex/data/models/question_model.dart';
 import 'package:kaal_spinnex/data/models/room_models.dart';
 
 void main() {
@@ -279,7 +278,7 @@ void main() {
         expect(result.spinnerPlayer['name'], equals('Spinner'));
         expect(result.targetPlayer['name'], equals('Target'));
         expect(result.targetPlayerIndex, equals(3));
-        expect(result.question.id, equals(77));
+        expect(result.question.id, equals('77'));
         expect(result.question.type, equals('DARE'));
         expect(result.question.category, equals('Party'));
         expect(result.timestamp, equals(1700005555));

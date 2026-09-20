@@ -48,6 +48,19 @@ class GameController extends GetxController
   final List<Question> _truthQuestionDeck = [];
   final List<Question> _dareQuestionDeck = [];
 
+  // Question ID history tracking (MongoDB String ObjectId)
+  final Set<String> answeredQuestionIds = <String>{};
+
+  void markQuestionAnswered(String questionId) {
+    if (questionId.isNotEmpty) {
+      answeredQuestionIds.add(questionId);
+    }
+  }
+
+  bool isQuestionAnswered(String questionId) {
+    return answeredQuestionIds.contains(questionId);
+  }
+
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -488,6 +501,9 @@ class GameController extends GetxController
       );
       return;
     }
+
+    // Mark question as answered in state history
+    markQuestionAnswered(challenge.id);
 
     // Navigate to Challenge View and wait for the result
     Get.toNamed(

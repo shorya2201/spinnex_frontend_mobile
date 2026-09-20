@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'package:flutter/animation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:kaal_spinnex/data/models/player_model.dart';
@@ -13,12 +11,12 @@ List<PlayerModel> _players(int n) =>
 List<Question> _questions({int truthCount = 5, int dareCount = 5}) => [
       ...List.generate(
         truthCount,
-        (i) => Question(id: i, content: 'T$i', type: 'TRUTH', category: 'CLASSIC'),
+        (i) => Question(id: '$i', content: 'T$i', type: 'TRUTH', category: 'CLASSIC'),
       ),
       ...List.generate(
         dareCount,
         (i) => Question(
-            id: i + 100, content: 'D$i', type: 'DARE', category: 'CLASSIC'),
+            id: '${i + 100}', content: 'D$i', type: 'DARE', category: 'CLASSIC'),
       ),
     ];
 
@@ -155,14 +153,14 @@ void main() {
 
     test('returns null when no TRUTH questions exist', () {
       final ctrl = _makeCtrl(questions: [
-        Question(id: 1, content: 'D1', type: 'DARE', category: 'CLASSIC'),
+        Question(id: '1', content: 'D1', type: 'DARE', category: 'CLASSIC'),
       ]);
       expect(ctrl.getChallenge('TRUTH'), isNull);
     });
 
     test('returns null when no DARE questions exist', () {
       final ctrl = _makeCtrl(questions: [
-        Question(id: 1, content: 'T1', type: 'TRUTH', category: 'CLASSIC'),
+        Question(id: '1', content: 'T1', type: 'TRUTH', category: 'CLASSIC'),
       ]);
       expect(ctrl.getChallenge('DARE'), isNull);
     });
@@ -170,7 +168,7 @@ void main() {
     test('deck refills after all questions are drawn', () {
       final ctrl = _makeCtrl(
           questions: List.generate(
-              3, (i) => Question(id: i, content: 'T$i', type: 'TRUTH', category: 'CLASSIC')));
+              3, (i) => Question(id: '$i', content: 'T$i', type: 'TRUTH', category: 'CLASSIC')));
       // Draw all 3
       ctrl.getChallenge('TRUTH');
       ctrl.getChallenge('TRUTH');
@@ -178,6 +176,16 @@ void main() {
       // 4th draw should refill and not return null
       final q = ctrl.getChallenge('TRUTH');
       expect(q, isNotNull);
+    });
+
+    test('tracks answered question IDs in Set<String>', () {
+      final ctrl = _makeCtrl();
+      const testId = '6aaf8834761ea6137cf460f8';
+      expect(ctrl.isQuestionAnswered(testId), isFalse);
+
+      ctrl.markQuestionAnswered(testId);
+      expect(ctrl.isQuestionAnswered(testId), isTrue);
+      expect(ctrl.answeredQuestionIds.contains(testId), isTrue);
     });
 
     test('returns null when questions list is completely empty', () {
@@ -202,16 +210,6 @@ void main() {
   group('GameController – _triggerSyncedSpin (online synced spin)', () {
     test('negative targetIndex is ignored (no-op)', () async {
       final ctrl = _makeCtrl(numPlayers: 3, isOnline: true);
-      // Call internal via handleSpinResult with bad index
-      final badJson = {
-        'roomCode': 'X1',
-        'spinnerPlayer': {'playerId': 'p1', 'name': 'A'},
-        'targetPlayer': {'playerId': 'p2', 'name': 'B'},
-        'targetPlayerIndex': -1,
-        'question': {'id': 1, 'content': 'Q', 'type': 'TRUTH', 'category': 'CLASSIC'},
-        'timestamp': 0,
-      };
-      // Expose through the handler to test the guard
       ctrl.isSpinning.value = false;
       // Access internal via handleSpinResult JSON – it calls _triggerSyncedSpin
       // which has the guard: if (targetIndex < 0 || targetIndex >= players.length) return;
