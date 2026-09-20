@@ -43,10 +43,7 @@ class CyberWheelWidget extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppTheme.surfaceWhite,
-              border: Border.all(
-                color: AppTheme.neonPink,
-                width: 2,
-              ),
+              border: Border.all(color: AppTheme.neonPink, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: AppTheme.neonPink.withValues(alpha: 0.35),
@@ -168,9 +165,7 @@ class _CyberWheelPainter extends CustomPainter {
         fontSize: 10,
         fontWeight: FontWeight.bold,
         color: Colors.white,
-        shadows: const [
-          Shadow(color: Colors.black87, blurRadius: 4),
-        ],
+        shadows: const [Shadow(color: Colors.black87, blurRadius: 4)],
       ),
     );
 
@@ -280,13 +275,9 @@ class CyberRadarWidget extends StatelessWidget {
         height: isHighlighted ? 44 : 36,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isHighlighted
-              ? AppTheme.neonGreen
-              : AppTheme.surfaceWhite,
+          color: isHighlighted ? AppTheme.neonGreen : AppTheme.surfaceWhite,
           border: Border.all(
-            color: isHighlighted
-                ? AppTheme.neonGreen
-                : AppTheme.borderLight,
+            color: isHighlighted ? AppTheme.neonGreen : AppTheme.borderLight,
             width: isHighlighted ? 2.5 : 1.5,
           ),
           boxShadow: [
@@ -299,10 +290,7 @@ class CyberRadarWidget extends StatelessWidget {
           ],
         ),
         child: Center(
-          child: Text(
-            player.emoji,
-            style: const TextStyle(fontSize: 18),
-          ),
+          child: Text(player.emoji, style: const TextStyle(fontSize: 18)),
         ),
       ),
     );
@@ -313,10 +301,7 @@ class _RadarScopePainter extends CustomPainter {
   final double currentAngle;
   final bool isSpinning;
 
-  _RadarScopePainter({
-    required this.currentAngle,
-    required this.isSpinning,
-  });
+  _RadarScopePainter({required this.currentAngle, required this.isSpinning});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -434,10 +419,7 @@ class CyberJackpotWidget extends StatelessWidget {
                     children: [
                       Text(
                         activePlayer?.emoji ?? "🃏",
-                        style: const TextStyle(
-                          fontSize: 34,
-                          height: 1.1,
-                        ),
+                        style: const TextStyle(fontSize: 34, height: 1.1),
                       ),
                       const SizedBox(height: 6),
                       Padding(
@@ -445,7 +427,7 @@ class CyberJackpotWidget extends StatelessWidget {
                         child: Text(
                           activePlayer != null
                               ? activePlayer!.name.toUpperCase()
-                              : (isSpinning ? "SHUFFLING..." : "TAP TO DRAW"),
+                              : (isSpinning ? "SHUFFLING..." : "TAP TO START"),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.orbitron(

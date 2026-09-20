@@ -472,12 +472,15 @@ class GameView extends GetView<GameController> {
 
     Color themeColor = player.color;
     double avatarRadius = isWinner ? 27.0 : 22.0;
+    const double nodeWidth = 80.0;
 
     return Positioned(
-      left: x - 38,
+      left: x - (nodeWidth / 2),
       top: y - avatarRadius,
+      width: nodeWidth,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Stack(
             alignment: Alignment.center,
